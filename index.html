@@ -131,7 +131,8 @@ h2{font-size:1.4rem;font-weight:800}
 .ghost{background:rgba(255,255,255,.16);color:var(--ink);font-size:1.2rem;font-weight:700;border-radius:999px;padding:10px 24px}
 .soft{background:#f1ecff;color:var(--card-ink)}
 
-.overlay{position:fixed;inset:0;background:rgba(20,10,50,.6);display:grid;place-items:center;z-index:20;padding:20px;overflow-y:auto}
+.overlay{position:fixed;inset:0;background:rgba(20,10,50,.6);display:flex;z-index:20;padding:20px;overflow-y:auto}
+.overlay>.sheet{margin:auto}
 .sheet{background:var(--card);color:var(--card-ink);border-radius:32px;padding:26px;width:min(460px,100%);display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center;animation:pop .3s}
 .sheet h2{font-size:1.8rem}
 .won{font-size:56px;letter-spacing:4px}
@@ -165,6 +166,10 @@ h2{font-size:1.4rem;font-weight:800}
 .login{margin:8px auto 0;gap:10px}
 .login .lbl{align-self:stretch;text-align:start;font-weight:700;margin-bottom:-4px}
 .login input{font-size:1.15rem;text-align:left}
+.reqcode{font-size:3rem;font-weight:800;letter-spacing:.2em;direction:ltr;color:var(--sky-bot);line-height:1}
+.mini{font-size:.95rem;padding:6px 14px}
+.mini.ok{background:#d8ffe9}
+.sheet textarea{width:100%;height:110px;font-family:ui-monospace,Menlo,monospace;font-size:.7rem;border-radius:12px;border:2px solid #e2dbff;padding:8px;color:var(--card-ink);background:#faf8ff;resize:vertical;user-select:text;-webkit-user-select:text}
 .code{font-family:ui-monospace,Menlo,monospace;font-size:1.25rem;letter-spacing:.06em;background:#f3efff;border-radius:14px;padding:10px 14px;direction:ltr;user-select:all;-webkit-user-select:all;word-break:break-all}
 .small{font-size:.95rem;color:#5a4f80;margin:0}
 .section{width:100%;display:flex;flex-direction:column;gap:8px;align-items:center;padding-top:10px;border-top:2px solid #f1ecff}
@@ -210,6 +215,16 @@ const T = {
     defName:"اسم البنت", lang:"English",
     syncOn:"متزامن", syncOff:"بدون مزامنة", syncWait:"يتصل…",
     settings:"إعدادات المسؤول", close:"إغلاق",
+    pendTitle:"هذا الجهاز يحتاج موافقة المسؤول", pendSub:"اكتب اسم للجهاز عشان يعرفه المسؤول، وأرسل الطلب.",
+    devName:"اسم الجهاز", devNamePh:"مثال: آيباد بيت جدتي", sendReq:"أرسل الطلب", sending:"يرسل…",
+    waiting:"بانتظار موافقة المسؤول…", reqCode:"رمز الطلب", cancelReq:"إلغاء الطلب", iAmAdmin:"أنا المسؤول",
+    backBtn:"رجوع", loadingKids:"نجهّز البنات…", reqErr:"ما انرسل الطلب. تأكد من الإنترنت وجرب مرة ثانية.",
+    reqs:"طلبات الأجهزة", noReqs:"ما فيه طلبات", approve:"موافقة", reject:"رفض",
+    devices:"الأجهزة المسموحة", noDevices:"ما فيه أجهزة لسا", revoke:"إلغاء", tapAgain:"اضغط مرة ثانية",
+    girls:"البنات", addGirl:"إضافة بنت", removeGirl:"حذف البنت", removeSure:"متأكد؟ تنحذف نجومها. اضغط مرة ثانية",
+    rules:"قواعد الأمان", rulesNote:"انسخها والصقها في Firebase ← Firestore Database ← Rules، واضغط Publish. وبعدها قفّل التطبيق وافتحه.",
+    copy:"نسخ", copyRules:"نسخ القواعد", copied:"تم النسخ ✓",
+    thisDevice:"هذا الجهاز", adminLoginNote:"إذا دخلت كمسؤول على هذا الجهاز، يصير له كل الصلاحيات. ولو طلعت بعدين، يحتاج موافقة جديدة.",
     loginTitle:"دخول المسؤول", loginSub:"مرة وحدة بس على هذا الجهاز، وبعدها يتذكرك.",
     email:"الإيميل", password:"كلمة السر", loginBtn:"دخول", loggingIn:"يدخل…",
     loginBad:"الإيميل أو كلمة السر غلط", loginNet:"ما فيه اتصال بالإنترنت. جرب مرة ثانية.", loginErr:"ما ضبط الدخول. جرب مرة ثانية.",
@@ -243,6 +258,16 @@ const T = {
     defName:"Name", lang:"العربية",
     syncOn:"Synced", syncOff:"Not syncing", syncWait:"Connecting…",
     settings:"Admin settings", close:"Close",
+    pendTitle:"This device needs the admin's approval", pendSub:"Give this device a name so the admin recognizes it, then send the request.",
+    devName:"Device name", devNamePh:"Example: Grandma's iPad", sendReq:"Send request", sending:"Sending…",
+    waiting:"Waiting for the admin to approve…", reqCode:"Request code", cancelReq:"Cancel request", iAmAdmin:"I'm the admin",
+    backBtn:"Back", loadingKids:"Getting the girls ready…", reqErr:"The request wasn't sent. Check the internet and try again.",
+    reqs:"Device requests", noReqs:"No requests", approve:"Approve", reject:"Decline",
+    devices:"Approved devices", noDevices:"No devices yet", revoke:"Remove", tapAgain:"Tap again",
+    girls:"Girls", addGirl:"Add a girl", removeGirl:"Delete this girl", removeSure:"Sure? Her stars will be deleted. Tap again",
+    rules:"Security rules", rulesNote:"Copy and paste them in Firebase → Firestore Database → Rules, then press Publish. Then close and reopen the app.",
+    copy:"Copy", copyRules:"Copy rules", copied:"Copied ✓",
+    thisDevice:"This device", adminLoginNote:"Signing in as admin gives this device full control. If you sign out later, it needs a new approval.",
     loginTitle:"Admin sign-in", loginSub:"Only once on this device. It remembers you after that.",
     email:"Email", password:"Password", loginBtn:"Sign in", loggingIn:"Signing in…",
     loginBad:"Wrong email or password", loginNet:"No internet connection. Try again.", loginErr:"Sign-in didn't work. Try again.",
@@ -270,10 +295,14 @@ const LS = {
 
 let lang = LS.get("nj_lang","ar");
 const t = k => T[lang][k];
-// Data lives under the parent's own Firebase account: users/{uid}/kids/{kidId}.
-// The rules let only that account read or write it.
+// Who is using this device:
+//   "admin"  - the parent, signed in with email and password (full control)
+//   "device" - a device the admin approved (sees the girls, plays, earns stars)
+//   null     - a new device waiting for approval
+// The security rules in Firebase enforce the same thing on the server.
 let uid = null;
-let signedIn = LS.get("nj_signed", false);   // remembered so a signed-in device opens straight to the girls
+let role = LS.get("nj_role", null);
+const setRole = r => { role = r; LS.set("nj_role", r); };
 
 const defaults = () => ([
   {id:"k1",name:"عزيزة",avatar:"🦄",color:"#ffb3d4",stars:0,best:{}},
@@ -281,21 +310,9 @@ const defaults = () => ([
   {id:"k3",name:"سلمى",avatar:"🦋",color:"#bfe3ff",stars:0,best:{}},
   {id:"k4",name:"يارا",avatar:"🐰",color:"#ffd9a8",stars:0,best:{}}
 ]);
-// The three girls always exist. A missing profile is added; an empty name is filled in.
-// Names, pictures and colors changed in the app are kept.
-function ensureRoster(list){
-  const out = (list||[]).map(k=>({...k})), fixes = [];
-  for(const d of defaults()){
-    const k = out.find(x=>x.id===d.id);
-    if(!k){ out.push(d); fixes.push(d); }
-    else if(!String(k.name||"").trim()){ k.name=d.name; fixes.push(k); }
-  }
-  out.sort((a,b)=>a.id.localeCompare(b.id));
-  return {list:out, fixes};
-}
-let kids = ensureRoster(LS.get("nj_kids",null)).list;
+let kids = LS.get("nj_kids",null) || [];
 let currentId = null;   // every launch starts at the profile picker, so the password is always asked
-let view = signedIn ? "who" : "login";
+let view = role ? "who" : "pending";
 let guest = null;       // guest profile lives in memory only and is never saved
 let cleanup = null;
 let sync = "wait"; // wait | on | off | nonet
@@ -312,7 +329,7 @@ async function hashPin(id,pin){
 }
 
 // ---- writes (local first, cloud when available) ----
-const kidRef = id => F.doc(F.db,"users",uid,"kids",id);
+const kidRef = id => F.doc(F.db,"kids",id);
 function cloudSet(k){ if(F) F.setDoc(kidRef(k.id), clean(k)).catch(onCloudError); }
 function cloudReward(k,stars,game,value,isBest){
   if(!F) return;
@@ -346,7 +363,7 @@ function applyLang(){
   document.documentElement.dir = lang==="ar"?"rtl":"ltr";
   document.title = t("app");
 }
-function go(v){ if(cleanup){cleanup();cleanup=null} if(v==="who"||v==="login"){ currentId=null; guest=null; $("#layer").innerHTML=""; } view=v; render(); window.scrollTo(0,0); }
+function go(v){ if(cleanup){cleanup();cleanup=null} if(v==="who"||v==="login"||v==="pending"){ currentId=null; guest=null; $("#layer").innerHTML=""; } view=v; render(); window.scrollTo(0,0); }
 function setSync(s){ sync=s; const el=$("#syncPill"); if(el){ el.className="pill sync "+(s==="on"?"on":s==="wait"?"":"off"); el.lastChild.textContent=" "+syncLabel(); } }
 const syncLabel = () => sync==="on"?t("syncOn"):sync==="wait"?t("syncWait"):t("syncOff");
 
@@ -354,8 +371,9 @@ const logo = `<svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><path d="
 
 function topBar(){
   const k = cur();
-  return `<div class="bar${view==="who"||view==="login"?" bar-who":""}">
-    ${view==="who"||view==="login" ? "" : `<div class="brand">${logo}<span>${t("app")}</span></div>`}
+  const plain = view==="who"||view==="login"||view==="pending";
+  return `<div class="bar${plain?" bar-who":""}">
+    ${plain ? "" : `<div class="brand">${logo}<span>${t("app")}</span></div>`}
     <div class="bar-actions">
       ${k && view!=="who" ? `<span class="pill starcount">⭐ ${num(k.stars||0)}</span>`:""}
       ${view==="who" ? `<span class="pill sync ${sync==="on"?"on":sync==="wait"?"":"off"}" id="syncPill"><i></i> ${syncLabel()}</span>`:""}
@@ -370,6 +388,7 @@ function render(){
   const app = $("#app");
   if(view==="hub" && !cur()) view="who";
   if(view==="login") app.innerHTML = topBar()+loginView();
+  else if(view==="pending") app.innerHTML = topBar()+pendingView();
   else if(view==="who") app.innerHTML = topBar()+whoView();
   else if(view==="hub") app.innerHTML = topBar()+hubView();
   else app.innerHTML = topBar()+gameShell();
@@ -377,10 +396,11 @@ function render(){
   // Parent settings are hidden: press and hold the big title for 2 seconds.
   const ht = view==="who" && $(".hero-title");
   if(ht){ let lp=null; const stop=()=>clearTimeout(lp);
-    ht.onpointerdown=()=>{ stop(); lp=setTimeout(()=>{ tone(440,.15,"triangle"); openSettings(); },2000); };
+    ht.onpointerdown=()=>{ stop(); lp=setTimeout(()=>{ tone(440,.15,"triangle"); role==="admin"?openSettings():openDeviceSettings(); },2000); };
     ht.onpointerup=stop; ht.onpointerleave=stop; ht.onpointercancel=stop;
     ht.oncontextmenu=e=>e.preventDefault(); }
   if(view==="login") bindLogin();
+  if(view==="pending") bindPending();
   if(view==="who") bindWho();
   if(view==="hub") bindHub();
   if(view==="g-mem") startMemory();
@@ -407,14 +427,17 @@ function loginView(){
       <p class="pin-msg" id="loginMsg"></p>
       <button class="big" type="submit" id="loginBtn">${t("loginBtn")}</button>
       <button class="danger" type="button" id="forgot">${t("forgot")}</button>
+      ${role!=="admin"?`<button class="ghost soft" type="button" id="loginBack">${t("backBtn")}</button>`:""}
     </form>`;
 }
 function bindLogin(){
   const msg=$("#loginMsg"), btn=$("#loginBtn");
+  const lb=$("#loginBack"); if(lb) lb.onclick=()=>go(role?"who":"pending");
   $("#loginForm").onsubmit=async e=>{
     e.preventDefault();
     if(!A){ msg.textContent=t("loginNet"); return; }
     btn.disabled=true; btn.textContent=t("loggingIn"); msg.textContent="";
+    if(myRequest && F && uid) F.deleteDoc(F.doc(F.db,"requests",uid)).catch(()=>{});
     try{ await A.signIn(A.auth, $("#em").value.trim(), $("#pw").value); }
     catch(err){
       const c=(err&&err.code)||"";
@@ -448,7 +471,7 @@ function whoView(){
       <div class="hero-stars" aria-hidden="true"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div>
     </header>
     <div class="center"><h1>${t("who")}</h1><p class="sub">${t("whoSub")}</p></div>
-    <div class="kids">${cards}</div>
+    ${kids.length?`<div class="kids">${cards}</div>`:`<p class="note" style="font-size:1.2rem">${t("loadingKids")}</p>`}
     <div class="row"><button class="guest-btn" id="guestBtn">👤 ${t("guestBtn")}</button></div>${warn}`;
 }
 function bindWho(){
@@ -628,21 +651,24 @@ function openEditor(id){
   const draw=()=>{
     $("#layer").innerHTML=`<div class="overlay"><form class="sheet" id="ed" role="dialog" aria-modal="true">
       <div style="width:90px;height:90px;border-radius:50%;display:grid;place-items:center;font-size:54px;background:${k.color}" aria-hidden="true">${esc(k.avatar)}</div>
-      <label for="kname" style="font-weight:700">${t("name")}</label>
-      <input id="kname" value="${esc(k.name)}" maxlength="20" autocomplete="off" placeholder="${t("defName")}">
+      ${role==="admin"?`<label for="kname" style="font-weight:700">${t("name")}</label>
+      <input id="kname" value="${esc(k.name)}" maxlength="20" autocomplete="off" placeholder="${t("defName")}">`
+      :`<div class="pin-name">${esc(kidName(k))}</div>`}
       <div style="font-weight:700">${t("avatar")}</div>
       <div class="pick">${AVATARS.map(a=>`<button type="button" data-a="${a}" aria-pressed="${a===k.avatar}">${a}</button>`).join("")}</div>
       <div style="font-weight:700">${t("color")}</div>
       <div class="pick colors">${COLORS.map(c=>`<button type="button" data-c="${c}" style="background:${c}" aria-pressed="${c===k.color}" aria-label="${c}">.</button>`).join("")}</div>
       <div class="row"><button class="big" type="submit">${t("save")}</button><button class="ghost soft" type="button" id="cx">${t("cancel")}</button></div>
       ${existing?`<button type="button" class="danger" id="chPin">🔒 ${t("pinChange")}</button>`:""}
+      ${existing&&role==="admin"?`<button type="button" class="danger" id="del">🗑️ ${armed?t("removeSure"):t("removeGirl")}</button>`:""}
     </form></div>`;
-    $("#kname").oninput=e=>k.name=e.target.value;
+    const kn=$("#kname"); if(kn) kn.oninput=e=>k.name=e.target.value;
     document.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{k.avatar=b.dataset.a;draw()});
     document.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{k.color=b.dataset.c;draw()});
     $("#cx").onclick=()=>$("#layer").innerHTML="";
     const ch=$("#chPin"); if(ch) ch.onclick=()=>openPin(existing,"new",()=>{ k.pin=existing.pin; draw(); });
     $("#ed").onsubmit=e=>{e.preventDefault();k.name=k.name.trim();
+      if(!k.name){ const kn=$("#kname"); if(kn) kn.focus(); return; }
       const i=kids.findIndex(x=>x.id===k.id); if(i>=0) kids[i]=k; else kids.push(k);
       cacheKids(); cloudSet(k); $("#layer").innerHTML=""; render();};
     const d=$("#del"); if(d) d.onclick=()=>{ if(!armed){armed=true;draw();return}
@@ -703,62 +729,235 @@ function openPin(kid, mode, onDone){
   $("#pinX").onclick=close;
 }
 
-// ================= parent settings =================
-function openSettings(){
+// ================= device approval screen =================
+let myRequest = null;      // this device's pending request, if any
+function pendingView(){
+  return `<header class="hero">
+      <div class="hero-title">${t("app")}</div>
+      <div class="hero-stars" aria-hidden="true"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div>
+    </header>
+    <div class="sheet login">
+      <h2>📱 ${t("pendTitle")}</h2>
+      ${myRequest ? `
+        <p class="pin-title">${t("waiting")}</p>
+        <div class="small">${t("devName")}: <b>${esc(myRequest.name)}</b></div>
+        <div class="small">${t("reqCode")}</div>
+        <div class="reqcode">${String(myRequest.code).split("").map(num).join("")}</div>
+        <button class="ghost soft" id="cancelReq">${t("cancelReq")}</button>`
+      : `
+        <p class="small">${t("pendSub")}</p>
+        <form id="reqForm" style="display:flex;flex-direction:column;gap:10px;width:100%;align-items:center">
+          <label for="dn" class="lbl">${t("devName")}</label>
+          <input id="dn" maxlength="40" autocomplete="off" placeholder="${t("devNamePh")}" required>
+          <p class="pin-msg" id="reqMsg"></p>
+          <button class="big" type="submit" id="reqBtn">${t("sendReq")}</button>
+        </form>`}
+      <button class="danger" id="iAmAdmin">🔐 ${t("iAmAdmin")}</button>
+    </div>`;
+}
+function bindPending(){
+  $("#iAmAdmin").onclick=()=>go("login");
+  const f=$("#reqForm");
+  if(f) f.onsubmit=async e=>{
+    e.preventDefault();
+    const name=$("#dn").value.trim().slice(0,40); if(!name) return;
+    const btn=$("#reqBtn"), msg=$("#reqMsg");
+    if(!F||!uid){ msg.textContent=t("reqErr"); return; }
+    btn.disabled=true; btn.textContent=t("sending");
+    const code=String(1000+Math.floor(Math.random()*9000));
+    try{ await F.setDoc(F.doc(F.db,"requests",uid),{name,code,at:F.serverTimestamp()}); }
+    catch(err){ console.warn(err); msg.textContent=t("reqErr"); btn.disabled=false; btn.textContent=t("sendReq"); }
+  };
+  const c=$("#cancelReq");
+  if(c) c.onclick=()=>{ if(F&&uid) F.deleteDoc(F.doc(F.db,"requests",uid)).catch(()=>{}); };
+}
+
+// ================= device settings (approved device) =================
+function openDeviceSettings(){
   $("#layer").innerHTML=`<div class="overlay"><div class="sheet" role="dialog" aria-modal="true">
+    <h2>📱 ${t("thisDevice")}</h2>
+    <p class="small">${sync==="on"?"🟢 "+t("syncOn"):sync==="nonet"?"📡 "+t("syncNoNet"):sync==="off"?"⚠️ "+t("syncErr"):"⏳ "+t("syncWait")}</p>
+    <div class="section"><b>🔐 ${t("iAmAdmin")}</b><p class="small">${t("adminLoginNote")}</p>
+      <button class="ghost soft" id="toLogin">${t("loginBtn")}</button></div>
+    <button class="big" id="closeS">${t("close")}</button>
+  </div></div>`;
+  $("#toLogin").onclick=()=>go("login");
+  $("#closeS").onclick=()=>{$("#layer").innerHTML="";};
+}
+
+// ================= admin settings =================
+let requests=[], devices=[];
+const RULES_TEMPLATE = `rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isAdmin() { return signedIn() && request.auth.uid == 'ADMIN_UID'; }
+    function isDevice() { return signedIn() && exists(/databases/$(database)/documents/devices/$(request.auth.uid)); }
+    function validKid() {
+      return request.resource.data.keys().hasOnly(['name', 'avatar', 'color', 'stars', 'best', 'pin'])
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 20
+        && request.resource.data.avatar is string && request.resource.data.avatar.size() <= 16
+        && request.resource.data.color is string && request.resource.data.color.size() <= 9
+        && request.resource.data.stars is int && request.resource.data.stars >= 0
+        && request.resource.data.best is map
+        && (!('pin' in request.resource.data)
+            || (request.resource.data.pin is string && request.resource.data.pin.size() == 64));
+    }
+
+    // The girls: the admin and approved devices can see them all.
+    // Devices can play and set passwords, but only the admin adds, renames or deletes a girl.
+    match /kids/{kidId} {
+      allow read: if isAdmin() || isDevice();
+      allow create: if isAdmin() && validKid();
+      allow update: if validKid() && (isAdmin() || (isDevice() && request.resource.data.name == resource.data.name));
+      allow delete: if isAdmin();
+    }
+
+    // Approved devices: only the admin approves or removes them.
+    match /devices/{deviceId} {
+      allow read: if isAdmin() || (signedIn() && request.auth.uid == deviceId);
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['name', 'at'])
+        && request.resource.data.name is string && request.resource.data.name.size() <= 40;
+      allow delete: if isAdmin();
+    }
+
+    // Requests: a new device can only write its own request.
+    match /requests/{deviceId} {
+      allow read: if isAdmin() || (signedIn() && request.auth.uid == deviceId);
+      allow create: if signedIn() && request.auth.uid == deviceId
+        && request.resource.data.keys().hasOnly(['name', 'code', 'at'])
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 40
+        && request.resource.data.code is string && request.resource.data.code.size() == 4
+        && request.resource.data.at == request.time;
+      allow delete: if isAdmin() || (signedIn() && request.auth.uid == deviceId);
+    }
+
+    // Older setup, kept only so the admin's earlier data can be moved over.
+    match /users/{userId}/kids/{kidId} {
+      allow read, delete: if signedIn() && request.auth.uid == userId;
+    }
+  }
+}`;
+function twoTap(btn, onConfirm){
+  btn.onclick=()=>{ if(!btn.dataset.armed){ btn.dataset.armed="1"; btn.textContent=t("tapAgain"); return; } onConfirm(); };
+}
+function openSettings(){
+  const rulesText = RULES_TEMPLATE.replace("ADMIN_UID", uid||"");
+  const draw=()=>{
+    $("#layer").innerHTML=`<div class="overlay"><div class="sheet" role="dialog" aria-modal="true">
     <h2>⚙️ ${t("settings")}</h2>
     <p class="small">${sync==="on"?"🟢 "+t("syncOn"):sync==="nonet"?"📡 "+t("syncNoNet"):sync==="off"?"⚠️ "+t("syncErr"):"⏳ "+t("syncWait")}</p>
+
+    <div class="section"><b>📨 ${t("reqs")}</b>
+      ${requests.length ? requests.map(r=>`<div class="pinrow"><span>${esc(r.name)} <span class="small" dir="ltr">(${String(r.code).split("").map(num).join("")})</span></span>
+        <span class="row" style="gap:6px"><button class="ghost soft mini ok" data-approve="${esc(r.id)}">✅ ${t("approve")}</button><button class="ghost soft mini" data-reject="${esc(r.id)}">${t("reject")}</button></span></div>`).join("")
+        : `<p class="small">${t("noReqs")}</p>`}</div>
+
+    <div class="section"><b>📱 ${t("devices")}</b>
+      ${devices.length ? devices.map(d=>`<div class="pinrow"><span>${esc(d.name)}</span><button class="ghost soft mini" data-revoke="${esc(d.id)}">${t("revoke")}</button></div>`).join("")
+        : `<p class="small">${t("noDevices")}</p>`}</div>
+
+    <div class="section"><b>👧 ${t("girls")}</b>
+      ${kids.map(k=>`<div class="pinrow"><span>${esc(k.avatar)} ${esc(kidName(k))} <span class="small">⭐ ${num(k.stars||0)}</span></span><button class="ghost soft mini" data-editkid="${esc(k.id)}">✏️ ${t("edit")}</button></div>`).join("")}
+      <button class="ghost soft" id="addGirl">＋ ${t("addGirl")}</button></div>
+
     <div class="section"><b>🔒 ${t("pins")}</b><p class="small">${t("pinResetNote")}</p>
       ${kids.map(k=>`<div class="pinrow"><span>${esc(k.avatar)} ${esc(kidName(k))}</span>${k.pin
-        ?`<button class="ghost soft" data-reset="${esc(k.id)}">${t("pinReset")}</button>`
+        ?`<button class="ghost soft mini" data-reset="${esc(k.id)}">${t("pinReset")}</button>`
         :`<span class="small">${t("pinNone")}</span>`}</div>`).join("")}</div>
+
+    <div class="section"><b>🛡️ ${t("rules")}</b><p class="small">${t("rulesNote")}</p>
+      <textarea id="rulesBox" readonly dir="ltr">${esc(rulesText)}</textarea>
+      <button class="ghost soft" id="copyRules">${t("copyRules")}</button></div>
+
     <div class="section"><b>👤 ${t("account")}</b>
       <p class="small">${t("signedAs")}: <span dir="ltr">${esc(A&&A.auth.currentUser?A.auth.currentUser.email:"")}</span></p>
       <button class="danger" id="logout">${t("logout")}</button></div>
     <button class="big" id="closeS">${t("close")}</button>
   </div></div>`;
-  $("#logout").onclick=e=>{
-    const b=e.currentTarget;
-    if(!b.dataset.armed){ b.dataset.armed="1"; b.textContent=t("logoutSure"); return; }
-    $("#layer").innerHTML=""; if(A) A.signOut(A.auth);
+    document.querySelectorAll("[data-approve]").forEach(b=>b.onclick=async()=>{
+      const r=requests.find(x=>x.id===b.dataset.approve); if(!r||!F) return;
+      b.disabled=true;
+      try{ await F.setDoc(F.doc(F.db,"devices",r.id),{name:r.name,at:F.serverTimestamp()}); await F.deleteDoc(F.doc(F.db,"requests",r.id)); }
+      catch(e){ onCloudError(e); b.disabled=false; }
+    });
+    document.querySelectorAll("[data-reject]").forEach(b=>b.onclick=()=>{ if(F) F.deleteDoc(F.doc(F.db,"requests",b.dataset.reject)).catch(onCloudError); });
+    document.querySelectorAll("[data-revoke]").forEach(b=>twoTap(b,()=>{ if(F) F.deleteDoc(F.doc(F.db,"devices",b.dataset.revoke)).catch(onCloudError); }));
+    document.querySelectorAll("[data-editkid]").forEach(b=>b.onclick=()=>openEditor(b.dataset.editkid));
+    $("#addGirl").onclick=()=>openEditor(null);
+    document.querySelectorAll("[data-reset]").forEach(b=>twoTap(b,()=>{
+      const k=kids.find(x=>x.id===b.dataset.reset); if(!k) return;
+      delete k.pin; cacheKids(); cloudSet(k); draw();
+    }));
+    $("#copyRules").onclick=async e=>{
+      const b=e.currentTarget;
+      try{ await navigator.clipboard.writeText(rulesText); b.textContent=t("copied"); }
+      catch(err){ const box=$("#rulesBox"); box.focus(); box.select(); }
+    };
+    twoTap($("#logout"),()=>{ $("#layer").innerHTML=""; setRole(null); kids=[]; cacheKids(); if(A) A.signOut(A.auth); });
+    $("#closeS").onclick=()=>{ settingsRedraw=null; $("#layer").innerHTML=""; render(); };
   };
-  document.querySelectorAll("[data-reset]").forEach(b=>b.onclick=()=>{
-    if(!b.dataset.armed){ b.dataset.armed="1"; b.textContent=t("pinResetSure"); return; }
-    const k=kids.find(x=>x.id===b.dataset.reset); if(!k) return;
-    delete k.pin; cacheKids(); cloudSet(k); b.replaceWith(Object.assign(document.createElement("span"),{className:"small",textContent:t("pinNone")}));
-  });
-  $("#closeS").onclick=()=>{$("#layer").innerHTML=""; render();};
+  settingsRedraw=draw;
+  draw();
 }
+let settingsRedraw=null;   // live-refresh the admin panel when requests or devices change
+const refreshSettings=()=>{ if(settingsRedraw && $("#closeS") && $("#rulesBox")) settingsRedraw(); };
 
 // ================= cloud sync =================
-let unsub=null, seeded=false;
-function listen(){
-  if(!F) return;
-  if(unsub) unsub();
+let unsubs=[], seeded=false, A=null;
+const stopAll=()=>{ unsubs.forEach(u=>{try{u()}catch(e){}}); unsubs=[]; };
+const sortKids=list=>list.sort((a,b)=>a.id.localeCompare(b.id));
+
+function listenKids(isAdmin){
   seeded=false; setSync("wait");
-  const col = F.collection(F.db,"users",uid,"kids");
-  unsub = F.onSnapshot(col,{includeMetadataChanges:true}, snap=>{
-    const fromServer = !snap.metadata.fromCache;
+  unsubs.push(F.onSnapshot(F.collection(F.db,"kids"),{includeMetadataChanges:true}, async snap=>{
+    const fromServer=!snap.metadata.fromCache;
     if(fromServer) setSync("on");
-    if(snap.empty && !fromServer) return;
     if(snap.empty){
-      // First sign-in on this account: carry over this device's girls and stars.
-      // Old passwords can't move across (they were tied to the old setup), so each girl picks a new one.
-      if(seeded) return; seeded=true;
-      kids = ensureRoster(kids).list.map(k=>{ const c={...k}; delete c.pin; return c; });
-      kids.forEach(cloudSet); cacheKids();
+      if(!fromServer || !isAdmin || seeded) return;
+      // First time on this setup: move the admin's earlier girls over (or start with the default girls).
+      seeded=true;
+      let start=[];
+      try{ const old=await F.getDocs(F.collection(F.db,"users",uid,"kids")); start=old.docs.map(d=>({id:d.id,...d.data()})); }catch(e){}
+      if(!start.length) start=kids.length?kids:defaults();
+      kids=sortKids(start.map(k=>({...k}))); kids.forEach(cloudSet); cacheKids();
       if(!view.startsWith("g-") && !$("#layer").innerHTML) render();
       return;
     }
-    const r = ensureRoster(snap.docs.map(d=>({id:d.id,...d.data()})));
-    kids = r.list;
-    if(fromServer && !seeded){ seeded=true; r.fixes.forEach(cloudSet); }
+    kids=sortKids(snap.docs.map(d=>({id:d.id,...d.data()})));
     cacheKids();
     if(view.startsWith("g-")) refreshStars();
     else if(!$("#layer").innerHTML) render();
-  }, err=>{ onCloudError(err); unsub=null; render(); });
+    else refreshSettings();
+  }, err=>{ onCloudError(err); if(!$("#layer").innerHTML) render(); }));
 }
-let A = null;   // auth handles
+function asAdmin(){
+  setRole("admin");
+  listenKids(true);
+  unsubs.push(F.onSnapshot(F.collection(F.db,"requests"), s=>{ requests=s.docs.map(d=>({id:d.id,...d.data()})); refreshSettings(); }, e=>console.warn(e)));
+  unsubs.push(F.onSnapshot(F.collection(F.db,"devices"), s=>{ devices=s.docs.map(d=>({id:d.id,...d.data()})); refreshSettings(); }, e=>console.warn(e)));
+  if(view==="login"||view==="pending") go("who");
+}
+function asDevice(){
+  // Watch this device's approval. Approve -> girls appear; removed -> back to the request screen.
+  let kidsOn=false, reqUnsub=null;
+  unsubs.push(F.onSnapshot(F.doc(F.db,"devices",uid),{includeMetadataChanges:true}, snap=>{
+    if(snap.exists()){
+      if(reqUnsub){ reqUnsub(); reqUnsub=null; }
+      setRole("device");
+      if(!kidsOn){ kidsOn=true; listenKids(false); }
+      if(view==="pending") go("who");
+    } else if(!snap.metadata.fromCache){
+      setRole(null); kids=[]; cacheKids(); setSync("off");
+      if(!reqUnsub){
+        reqUnsub=F.onSnapshot(F.doc(F.db,"requests",uid), r=>{ myRequest=r.exists()?r.data():null; if(view==="pending") render(); }, e=>console.warn(e));
+        unsubs.push(()=>reqUnsub&&reqUnsub());
+      }
+      if(view!=="pending" && view!=="login") go("pending");
+    }
+  }, err=>{ console.warn(err); setSync("off"); }));
+}
 async function startCloud(){
   try{
     const [{initializeApp},au,fs] = await Promise.all([
@@ -770,23 +969,22 @@ async function startCloud(){
     let db;
     try{ db = fs.initializeFirestore(app,{localCache:fs.persistentLocalCache()}); }
     catch(e){ db = fs.getFirestore(app); }
+    F = {db, doc:fs.doc, collection:fs.collection, setDoc:fs.setDoc, updateDoc:fs.updateDoc, deleteDoc:fs.deleteDoc,
+         onSnapshot:fs.onSnapshot, increment:fs.increment, getDocs:fs.getDocs, serverTimestamp:fs.serverTimestamp};
     au.onAuthStateChanged(auth, user=>{
-      if(user && user.isAnonymous){ au.signOut(auth); return; }   // left over from the old setup
+      stopAll(); requests=[]; devices=[]; myRequest=null;
       if(!user){
-        if(unsub){ unsub(); unsub=null; }
-        F=null; uid=null; signedIn=false; LS.set("nj_signed",false);
-        if(view!=="login"){ go("login"); }
+        // Every device gets its own anonymous identity; the admin decides whether it may see anything.
+        uid=null;
+        au.signInAnonymously(auth).catch(e=>{ console.warn(e); setSync(navigator.onLine?"off":"nonet"); });
         return;
       }
-      if(F && uid===user.uid) return;
-      uid=user.uid; signedIn=true; LS.set("nj_signed",true);
-      F = {db, doc:fs.doc, collection:fs.collection, setDoc:fs.setDoc, updateDoc:fs.updateDoc, deleteDoc:fs.deleteDoc, onSnapshot:fs.onSnapshot, increment:fs.increment};
-      listen();
-      if(view==="login") go("who");
+      uid=user.uid;
+      if(user.isAnonymous) asDevice(); else asAdmin();
     });
   }catch(e){
     console.warn("Firebase not loaded", e);
-    setSync("nonet"); if(view==="who") render();
+    setSync("nonet"); if(view==="who"||view==="pending") render();
   }
 }
 
