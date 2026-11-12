@@ -143,6 +143,23 @@ h2{font-size:1.4rem;font-weight:800}
 .pick.colors button{font-size:0}
 .danger{background:none;color:#c0396b;font-weight:700;font-size:1rem;text-decoration:underline}
 .note{font-size:.95rem;color:var(--ink-soft);text-align:center;margin:0}
+.guest-btn{background:rgba(255,255,255,.12);color:var(--ink);border:2px dashed rgba(255,255,255,.45);border-radius:999px;padding:8px 22px;font-size:1.1rem;font-weight:700}
+.guest-btn:active{transform:translateY(2px)}
+.pin-sheet{gap:10px;width:min(360px,100%)}
+.pin-face{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;font-size:42px}
+.pin-name{font-size:1.5rem;font-weight:800;line-height:1}
+.pin-title{font-size:1.15rem;font-weight:700;color:#5a4f80}
+.dots{display:flex;gap:12px;direction:ltr;padding:6px 0}
+.dots i{width:18px;height:18px;border-radius:50%;border:3px solid #c5b6f5;display:block;transition:background .1s}
+.dots i.on{background:var(--sky-bot);border-color:var(--sky-bot)}
+.dots.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.pin-msg{min-height:1.4em;font-weight:700;color:#c0396b;font-size:1rem}
+.keypad{display:grid;grid-template-columns:repeat(3,68px);gap:12px;justify-content:center}
+.key{width:68px;height:68px;border-radius:50%;background:#f1ecff;color:var(--card-ink);font-size:1.8rem;font-weight:800;box-shadow:0 4px 0 #ddd3ff}
+.key:active{transform:translateY(3px);box-shadow:0 1px 0 #ddd3ff}
+.key-x{background:none;box-shadow:none;font-size:1.5rem;color:#7a6fa3}
+.pinrow{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:700;font-size:1.1rem}
 .code{font-family:ui-monospace,Menlo,monospace;font-size:1.25rem;letter-spacing:.06em;background:#f3efff;border-radius:14px;padding:10px 14px;direction:ltr;user-select:all;-webkit-user-select:all;word-break:break-all}
 .small{font-size:.95rem;color:#5a4f80;margin:0}
 .section{width:100%;display:flex;flex-direction:column;gap:8px;align-items:center;padding-top:10px;border-top:2px solid #f1ecff}
@@ -192,7 +209,13 @@ const T = {
     copy:"نسخ", copied:"تم النسخ ✓", famLink:"رابط لجهاز ثاني", famLinkNote:"افتح هذا الرابط من جوالك عشان تشوف نفس النجوم.",
     join:"عندي رمز عائلة", joinBtn:"انضمام", joinBad:"الرمز لازم يكون ٢٠ حرف أو أكثر",
     syncErr:"المزامنة متوقفة: تأكد من قواعد الأمان وتفعيل Anonymous في Firebase. النجوم محفوظة على هذا الجهاز.",
-    syncNoNet:"ما فيه اتصال. النجوم محفوظة على الجهاز وبتترفع لما يرجع النت."
+    syncNoNet:"ما فيه اتصال. النجوم محفوظة على الجهاز وبتترفع لما يرجع النت.",
+    guest:"ضيف", guestBtn:"العب كضيف", guestHi:"نجوم الضيف للتجربة بس، وتتصفّر أول ما تطلع.",
+    pinEnter:"اكتبي كلمة السر", pinNew:"اختاري كلمة سر من ٦ أرقام", pinAgain:"اكتبيها مرة ثانية للتأكيد",
+    pinWrong:"كلمة السر غلط، جربي مرة ثانية", pinMismatch:"ما تطابقت، نبدأ من جديد", pinSaved:"انحفظت كلمة السر ✓",
+    pinChange:"تغيير كلمة السر", pins:"كلمات السر", pinReset:"مسح كلمة السر", pinNone:"ما فيه كلمة سر",
+    pinResetSure:"اضغط مرة ثانية للتأكيد", pinResetNote:"إذا نست وحدة كلمة السر، امسحها هنا وبتختار كلمة جديدة أول ما تدخل.",
+    del:"مسح"
   },
   en: {
     app:"Najmat", who:"Who's playing today?", whoSub:"Pick your name and start collecting stars",
@@ -217,7 +240,13 @@ const T = {
     copy:"Copy", copied:"Copied ✓", famLink:"Link for another device", famLinkNote:"Open this link on your phone to see the same stars.",
     join:"I have a family code", joinBtn:"Join", joinBad:"The code must be at least 20 characters",
     syncErr:"Sync is off: check the security rules and that Anonymous sign-in is on in Firebase. Stars are saved on this device.",
-    syncNoNet:"No connection. Stars are saved on this device and will upload when you're back online."
+    syncNoNet:"No connection. Stars are saved on this device and will upload when you're back online.",
+    guest:"Guest", guestBtn:"Play as a guest", guestHi:"Guest stars are just for trying out. They reset when you leave.",
+    pinEnter:"Enter your password", pinNew:"Choose a 6-digit password", pinAgain:"Type it again to confirm",
+    pinWrong:"Wrong password, try again", pinMismatch:"They didn't match. Let's start over", pinSaved:"Password saved ✓",
+    pinChange:"Change password", pins:"Passwords", pinReset:"Clear password", pinNone:"No password",
+    pinResetSure:"Tap again to confirm", pinResetNote:"If someone forgets her password, clear it here. She'll choose a new one next time she enters.",
+    del:"Delete"
   }
 };
 const AVATARS=["🦄","🐱","🐰","🦋","🐼","🦊","🐬","🌸","🧚","🐢","🦁","🐧"];
@@ -261,16 +290,22 @@ function ensureRoster(list){
   return {list:out, fixes};
 }
 let kids = ensureRoster(LS.get("nj_kids",null)).list;
-let currentId = LS.get("nj_current", null);
-let view = kids.find(k=>k.id===currentId) ? "hub" : "who";
+let currentId = null;   // every launch starts at the profile picker, so the password is always asked
+let view = "who";
+let guest = null;       // guest profile lives in memory only and is never saved
 let cleanup = null;
 let sync = "wait"; // wait | on | off | nonet
 let F = null;      // firebase handles
 
 const cacheKids = () => LS.set("nj_kids", kids);
 const kidName = k => k.name || t("defName");
-const cur = () => kids.find(k=>k.id===currentId);
-const clean = k => ({name:String(k.name||"").slice(0,20),avatar:k.avatar,color:k.color,stars:Math.max(0,k.stars|0),best:k.best||{}});
+const isGuest = () => currentId==="guest";
+const cur = () => isGuest() ? guest : kids.find(k=>k.id===currentId);
+const clean = k => { const o={name:String(k.name||"").slice(0,20),avatar:k.avatar,color:k.color,stars:Math.max(0,k.stars|0),best:k.best||{}}; if(k.pin) o.pin=k.pin; return o; };
+async function hashPin(id,pin){
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(fam+":"+id+":"+pin));
+  return Array.from(new Uint8Array(buf),b=>b.toString(16).padStart(2,"0")).join("");
+}
 
 // ---- writes (local first, cloud when available) ----
 function cloudSet(k){ if(F) F.setDoc(F.doc(F.db,"families",fam,"kids",k.id), clean(k)).catch(onCloudError); }
@@ -306,7 +341,7 @@ function applyLang(){
   document.documentElement.dir = lang==="ar"?"rtl":"ltr";
   document.title = t("app");
 }
-function go(v){ if(cleanup){cleanup();cleanup=null} view=v; render(); window.scrollTo(0,0); }
+function go(v){ if(cleanup){cleanup();cleanup=null} if(v==="who"){ currentId=null; guest=null; } view=v; render(); window.scrollTo(0,0); }
 function setSync(s){ sync=s; const el=$("#syncPill"); if(el){ el.className="pill sync "+(s==="on"?"on":s==="wait"?"":"off"); el.lastChild.textContent=" "+syncLabel(); } }
 const syncLabel = () => sync==="on"?t("syncOn"):sync==="wait"?t("syncWait"):t("syncOff");
 
@@ -366,22 +401,28 @@ function whoView(){
       <div class="hero-stars" aria-hidden="true"><span>⭐</span><span>⭐</span><span>⭐</span></div>
     </header>
     <div class="center"><h1>${t("who")}</h1><p class="sub">${t("whoSub")}</p></div>
-    <div class="kids">${cards}</div>${warn}`;
+    <div class="kids">${cards}</div>
+    <div class="row"><button class="guest-btn" id="guestBtn">👤 ${t("guestBtn")}</button></div>${warn}`;
 }
 function bindWho(){
   document.querySelectorAll(".kid[data-id]").forEach(el=>{
-    const pick = () => { currentId = el.dataset.id; LS.set("nj_current",currentId); tone(784,.12,"triangle"); go("hub"); };
+    const pick = () => { const k=kids.find(x=>x.id===el.dataset.id); if(!k) return; tone(784,.12,"triangle");
+      openPin(k, k.pin?"enter":"new", ()=>{ currentId=k.id; go("hub"); }); };
     el.onclick = e => { if(e.target.closest("[data-edit]")) return; pick(); };
     el.onkeydown = e => { if(e.key==="Enter"||e.key===" "){e.preventDefault();pick()} };
   });
-  document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=e=>{e.stopPropagation();openEditor(b.dataset.edit)});
+  document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=e=>{e.stopPropagation();
+    const k=kids.find(x=>x.id===b.dataset.edit); if(!k) return;
+    openPin(k, k.pin?"enter":"new", ()=>openEditor(k.id)); });
+  $("#guestBtn").onclick=()=>{ tone(784,.12,"triangle");
+    guest={id:"guest",name:t("guest"),avatar:"👤",color:"#e2cfff",stars:0,best:{}}; currentId="guest"; go("hub"); };
 }
 
 function hubView(){
   const k = cur(), b = k.best||{};
   return `<div class="hello">
       <div class="face" style="--c:${k.color}" aria-hidden="true">${esc(k.avatar)}</div>
-      <div><h1>${t("hi")} ${esc(kidName(k))}</h1><p class="sub">${t("hiSub")}</p></div>
+      <div><h1>${t("hi")} ${esc(kidName(k))}</h1><p class="sub">${isGuest()?"👤 "+t("guestHi"):t("hiSub")}</p></div>
     </div>
     <div class="row" style="justify-content:flex-start"><button class="ghost" id="switch">↩︎ ${t("who")}</button></div>
     <h2>${t("games")}</h2>
@@ -416,7 +457,8 @@ function reward(game, value, better, stars, line){
   const isBest = prev==null || better(value,prev);
   if(isBest) k.best[game]=value;
   k.stars = (k.stars||0)+stars;
-  cacheKids(); cloudReward(k,stars,game,value,isBest); refreshStars();
+  if(!isGuest()){ cacheKids(); cloudReward(k,stars,game,value,isBest); }
+  refreshStars();
   chime();
   const starsHtml = Array.from({length:stars},(_,i)=>`<span style="animation-delay:${i*.12}s">⭐</span>`).join("");
   $("#layer").innerHTML = `<div class="overlay"><div class="sheet" role="dialog" aria-modal="true">
@@ -546,11 +588,13 @@ function openEditor(id){
       <div style="font-weight:700">${t("color")}</div>
       <div class="pick colors">${COLORS.map(c=>`<button type="button" data-c="${c}" style="background:${c}" aria-pressed="${c===k.color}" aria-label="${c}">.</button>`).join("")}</div>
       <div class="row"><button class="big" type="submit">${t("save")}</button><button class="ghost soft" type="button" id="cx">${t("cancel")}</button></div>
+      ${existing?`<button type="button" class="danger" id="chPin">🔒 ${t("pinChange")}</button>`:""}
     </form></div>`;
     $("#kname").oninput=e=>k.name=e.target.value;
     document.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{k.avatar=b.dataset.a;draw()});
     document.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{k.color=b.dataset.c;draw()});
     $("#cx").onclick=()=>$("#layer").innerHTML="";
+    const ch=$("#chPin"); if(ch) ch.onclick=()=>openPin(existing,"new",()=>{ k.pin=existing.pin; draw(); });
     $("#ed").onsubmit=e=>{e.preventDefault();k.name=k.name.trim();
       const i=kids.findIndex(x=>x.id===k.id); if(i>=0) kids[i]=k; else kids.push(k);
       cacheKids(); cloudSet(k); $("#layer").innerHTML=""; render();};
@@ -559,6 +603,56 @@ function openEditor(id){
       if(currentId===k.id) currentId=null; $("#layer").innerHTML=""; render(); };
   };
   draw();
+}
+
+// ================= password keypad =================
+// mode "enter": check the girl's password. mode "new": choose one, type it twice, save it.
+function openPin(kid, mode, onDone){
+  let entry="", first=null, busy=false;
+  const title = () => mode==="enter" ? t("pinEnter") : first==null ? t("pinNew") : t("pinAgain");
+  const keys = ["1","2","3","4","5","6","7","8","9","x","0","del"];
+  $("#layer").innerHTML=`<div class="overlay" id="pinOv"><div class="sheet pin-sheet" role="dialog" aria-modal="true">
+    <div class="pin-face" style="background:${kid.color}" aria-hidden="true">${esc(kid.avatar)}</div>
+    <div class="pin-name">${esc(kidName(kid))}</div>
+    <div class="pin-title" id="pinTitle">${title()}</div>
+    <div class="dots" id="dots" aria-live="polite">${"<i></i>".repeat(6)}</div>
+    <div class="pin-msg" id="pinMsg"></div>
+    <div class="keypad" dir="ltr">${keys.map(k=>k==="x"?`<button class="key key-x" id="pinX" aria-label="${t("cancel")}">✕</button>`
+      :k==="del"?`<button class="key key-x" data-k="del" aria-label="${t("del")}">⌫</button>`
+      :`<button class="key" data-k="${k}">${num(k)}</button>`).join("")}</div>
+  </div></div>`;
+  const dots=[...document.querySelectorAll("#dots i")], msg=$("#pinMsg");
+  const paint=()=>dots.forEach((d,i)=>d.classList.toggle("on",i<entry.length));
+  const close=()=>{ document.removeEventListener("keydown",onKey); $("#layer").innerHTML=""; };
+  const shake=text=>{ msg.textContent=text; tone(180,.3,"sawtooth",.1); const d=$("#dots"); d.classList.remove("shake"); void d.offsetWidth; d.classList.add("shake"); };
+  async function full(){
+    busy=true;
+    if(mode==="enter"){
+      const h=await hashPin(kid.id,entry);
+      if(h===kid.pin){ tone(988,.15,"triangle"); close(); onDone(); return; }
+      entry=""; paint(); shake(t("pinWrong"));
+    } else if(first==null){
+      first=entry; entry=""; paint(); msg.textContent=""; $("#pinTitle").textContent=title();
+    } else if(first===entry){
+      kid.pin=await hashPin(kid.id,entry); cacheKids(); cloudSet(kid);
+      msg.textContent=t("pinSaved"); tone(988,.15,"triangle");
+      setTimeout(()=>{ close(); onDone(); },500); return;
+    } else {
+      first=null; entry=""; paint(); $("#pinTitle").textContent=title(); shake(t("pinMismatch"));
+    }
+    busy=false;
+  }
+  function press(k){
+    if(busy) return;
+    if(k==="del"){ entry=entry.slice(0,-1); paint(); return; }
+    if(entry.length>=6) return;
+    entry+=k; paint(); tone(600+entry.length*40,.06,"triangle",.12);
+    if(entry.length===6) setTimeout(full,150);
+  }
+  function onKey(e){ if(/^[0-9]$/.test(e.key)) press(e.key); else if(e.key==="Backspace") press("del"); else if(e.key==="Escape") close(); }
+  document.addEventListener("keydown",onKey);
+  document.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>press(b.dataset.k));
+  $("#pinX").onclick=close;
 }
 
 // ================= parent settings =================
@@ -575,6 +669,10 @@ function openSettings(){
       <input id="joinCode" autocomplete="off" autocapitalize="off" spellcheck="false" dir="ltr" placeholder="abcd…">
       <p class="small" id="joinMsg"></p>
       <button class="ghost soft" type="submit">${t("joinBtn")}</button></form>
+    <div class="section"><b>🔒 ${t("pins")}</b><p class="small">${t("pinResetNote")}</p>
+      ${kids.map(k=>`<div class="pinrow"><span>${esc(k.avatar)} ${esc(kidName(k))}</span>${k.pin
+        ?`<button class="ghost soft" data-reset="${esc(k.id)}">${t("pinReset")}</button>`
+        :`<span class="small">${t("pinNone")}</span>`}</div>`).join("")}</div>
     <button class="big" id="closeS">${t("close")}</button>
   </div></div>`;
   document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=async()=>{
@@ -588,6 +686,11 @@ function openSettings(){
     fam=c; LS.set("nj_family",fam); kids=[]; cacheKids(); currentId=null;
     $("#layer").innerHTML=""; view="who"; render(); listen();
   };
+  document.querySelectorAll("[data-reset]").forEach(b=>b.onclick=()=>{
+    if(!b.dataset.armed){ b.dataset.armed="1"; b.textContent=t("pinResetSure"); return; }
+    const k=kids.find(x=>x.id===b.dataset.reset); if(!k) return;
+    delete k.pin; cacheKids(); cloudSet(k); b.replaceWith(Object.assign(document.createElement("span"),{className:"small",textContent:t("pinNone")}));
+  });
   $("#closeS").onclick=()=>{$("#layer").innerHTML=""; render();};
 }
 

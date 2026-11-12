@@ -6,12 +6,14 @@ service cloud.firestore {
     match /families/{familyId}/kids/{kidId} {
       allow read, delete: if request.auth != null && familyId.size() >= 20;
       allow create, update: if request.auth != null && familyId.size() >= 20
-        && request.resource.data.keys().hasOnly(['name', 'avatar', 'color', 'stars', 'best'])
+        && request.resource.data.keys().hasOnly(['name', 'avatar', 'color', 'stars', 'best', 'pin'])
         && request.resource.data.name is string && request.resource.data.name.size() <= 20
         && request.resource.data.avatar is string && request.resource.data.avatar.size() <= 16
         && request.resource.data.color is string && request.resource.data.color.size() <= 9
         && request.resource.data.stars is int && request.resource.data.stars >= 0
-        && request.resource.data.best is map;
+        && request.resource.data.best is map
+        && (!('pin' in request.resource.data)
+            || (request.resource.data.pin is string && request.resource.data.pin.size() == 64));
     }
   }
 }
