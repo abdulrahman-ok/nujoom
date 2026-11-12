@@ -212,7 +212,7 @@ const T = {
     syncErr:"المزامنة متوقفة: تأكد من قواعد الأمان وتفعيل Anonymous في Firebase. النجوم محفوظة على هذا الجهاز.",
     syncNoNet:"ما فيه اتصال. النجوم محفوظة على الجهاز وبتترفع لما يرجع النت.",
     guest:"ضيف", guestBtn:"العب كضيف", guestHi:"نجوم الضيف للتجربة بس، وتتصفّر أول ما تطلع.",
-    pinEnter:"اكتبي كلمة السر", pinNew:"اختاري كلمة سر من ٦ أرقام", pinAgain:"اكتبيها مرة ثانية للتأكيد",
+    pinEnter:"اكتبي كلمة السر", pinNew:"اختاري كلمة سر من ٤ أرقام", pinAgain:"اكتبيها مرة ثانية للتأكيد",
     pinWrong:"كلمة السر غلط، جربي مرة ثانية", pinMismatch:"ما تطابقت، نبدأ من جديد", pinSaved:"انحفظت كلمة السر ✓",
     pinChange:"تغيير كلمة السر", pins:"كلمات السر", pinReset:"مسح كلمة السر", pinNone:"ما فيه كلمة سر",
     pinResetSure:"اضغط مرة ثانية للتأكيد", pinResetNote:"إذا نست وحدة كلمة السر، امسحها هنا وبتختار كلمة جديدة أول ما تدخل.",
@@ -243,7 +243,7 @@ const T = {
     syncErr:"Sync is off: check the security rules and that Anonymous sign-in is on in Firebase. Stars are saved on this device.",
     syncNoNet:"No connection. Stars are saved on this device and will upload when you're back online.",
     guest:"Guest", guestBtn:"Play as a guest", guestHi:"Guest stars are just for trying out. They reset when you leave.",
-    pinEnter:"Enter your password", pinNew:"Choose a 6-digit password", pinAgain:"Type it again to confirm",
+    pinEnter:"Enter your password", pinNew:"Choose a 4-digit password", pinAgain:"Type it again to confirm",
     pinWrong:"Wrong password, try again", pinMismatch:"They didn't match. Let's start over", pinSaved:"Password saved ✓",
     pinChange:"Change password", pins:"Passwords", pinReset:"Clear password", pinNone:"No password",
     pinResetSure:"Tap again to confirm", pinResetNote:"If someone forgets her password, clear it here. She'll choose a new one next time she enters.",
@@ -608,6 +608,7 @@ function openEditor(id){
 }
 
 // ================= password keypad =================
+const PIN_LEN = 4;
 // mode "enter": check the girl's password. mode "new": choose one, type it twice, save it.
 function openPin(kid, mode, onDone){
   let entry="", first=null, busy=false;
@@ -617,7 +618,7 @@ function openPin(kid, mode, onDone){
     <div class="pin-face" style="background:${kid.color}" aria-hidden="true">${esc(kid.avatar)}</div>
     <div class="pin-name">${esc(kidName(kid))}</div>
     <div class="pin-title" id="pinTitle">${title()}</div>
-    <div class="dots" id="dots" aria-live="polite">${"<i></i>".repeat(6)}</div>
+    <div class="dots" id="dots" aria-live="polite">${"<i></i>".repeat(PIN_LEN)}</div>
     <div class="pin-msg" id="pinMsg"></div>
     <div class="keypad" dir="ltr">${keys.map(k=>k==="x"?`<button class="key key-x" id="pinX" aria-label="${t("cancel")}">✕</button>`
       :k==="del"?`<button class="key key-x" data-k="del" aria-label="${t("del")}">⌫</button>`
@@ -647,9 +648,9 @@ function openPin(kid, mode, onDone){
   function press(k){
     if(busy) return;
     if(k==="del"){ entry=entry.slice(0,-1); paint(); return; }
-    if(entry.length>=6) return;
+    if(entry.length>=PIN_LEN) return;
     entry+=k; paint(); tone(600+entry.length*40,.06,"triangle",.12);
-    if(entry.length===6) setTimeout(full,150);
+    if(entry.length===PIN_LEN) setTimeout(full,150);
   }
   function onKey(e){ if(/^[0-9]$/.test(e.key)) press(e.key); else if(e.key==="Backspace") press("del"); else if(e.key==="Escape") close(); }
   document.addEventListener("keydown",onKey);
