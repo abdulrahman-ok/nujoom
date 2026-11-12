@@ -121,13 +121,17 @@ h2{font-size:1.4rem;font-weight:800}
 .card .f{background:var(--card);transform:rotateY(180deg)}
 .card.done .f{background:#d8ffe9}
 
-.simon{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:min(420px,100%)}
-.pad{aspect-ratio:1;border-radius:32px;opacity:.55;transition:opacity .1s,transform .1s;box-shadow:inset 0 -8px 0 rgba(0,0,0,.2)}
-.pad.lit{opacity:1;transform:scale(1.04);box-shadow:0 0 40px currentColor,inset 0 -8px 0 rgba(0,0,0,.2)}
-.pad[data-i="0"]{background:var(--pink);color:var(--pink)}
-.pad[data-i="1"]{background:var(--mint);color:var(--mint)}
-.pad[data-i="2"]{background:var(--sky);color:var(--sky)}
-.pad[data-i="3"]{background:var(--coral);color:var(--coral)}
+.stage{--c0:#ff5fa8;--c1:#22d3a5;--c2:#3b9dff;--c3:#ff9a1f;--c4:#ffe03a;--c5:#9d6bff;--c6:#6fd63a;--c7:#e8333f}
+.simon{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:min(420px,100%,calc(100vh - 300px))}
+.simon.p8{grid-template-columns:repeat(4,1fr);width:min(620px,100%,calc((100vh - 300px) * 2))}
+@media (max-width:560px){.simon.p8{grid-template-columns:1fr 1fr;width:min(100%,calc((100vh - 300px) / 2))}}
+.pad{aspect-ratio:1;border-radius:28%;opacity:.78;filter:saturate(.85);transition:opacity .1s,transform .1s,filter .1s;box-shadow:inset 0 -8px 0 rgba(0,0,0,.2);background:var(--pc);color:var(--pc)}
+.pad.lit{opacity:1;filter:saturate(1.15) brightness(1.15);transform:scale(1.08);box-shadow:0 0 40px currentColor,inset 0 -8px 0 rgba(0,0,0,.2)}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:min(100%,420px)}
+.dotrow{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;max-width:90px;margin-top:4px}
+.dotrow i{width:14px;height:14px;border-radius:50%;display:block}
+.speed{background:rgba(255,255,255,.14);color:var(--ink);border:3px solid rgba(255,255,255,.35);border-radius:999px;padding:10px 26px;font-size:1.25rem;font-weight:800}
+.speed.on{background:var(--star);color:var(--card-ink);border-color:var(--star-deep)}
 .simon.wait .pad{pointer-events:none}
 .msg{font-size:1.5rem;font-weight:800;text-align:center;min-height:2.2em}
 
@@ -221,7 +225,8 @@ const T = {
     learn:"تعلّم والعب", learnD:"رياضيات وإنجليزي بنجوم أكثر",
     moves:"حركات", pairs:"أزواج", level:"المستوى", score:"النقاط",
     bestMoves:n=>`أفضل نتيجة: ${n} حركة`, bestMemSize:(n,c)=>`أفضل نتيجة (${c} بطاقة): ${n} حركة`,
-    memPick:"كم بطاقة تبين؟", cards:"بطاقة", memEasy:"سهلة", memHard:"صعبة", bestLevel:n=>`أعلى مستوى: ${n}`, bestScore:n=>`أعلى نقاط: ${n}`, none:"ما لعبتيها لسا",
+    memPick:"كم بطاقة تبين؟", cards:"بطاقة", memEasy:"سهلة", memHard:"صعبة", bestLevel:n=>`أعلى مستوى: ${n}`,
+    simPick:"كم لون تبين؟", colors:"ألوان", fast:"ضعف السرعة", normalSpeed:"سرعة عادية", bestSimMode:(n,m)=>`أعلى مستوى (${m}): ${n}`, bestScore:n=>`أعلى نقاط: ${n}`, none:"ما لعبتيها لسا",
     back:"رجوع", start:"ابدئي", again:"مرة ثانية", home:"الألعاب",
     watch:"ركّزي…", yourTurn:"دورك!", oops:"أوه! خلص الدور",
     win:"برافو!", got:n=>`كسبتي ${n} نجوم`, newBest:"رقم قياسي جديد! 🎉",
@@ -265,7 +270,8 @@ const T = {
     learn:"Learn & Play", learnD:"Math and Arabic for even more stars",
     moves:"Moves", pairs:"Pairs", level:"Level", score:"Score",
     bestMoves:n=>`Best: ${n} moves`, bestMemSize:(n,c)=>`Best (${c} cards): ${n} moves`,
-    memPick:"How many cards?", cards:"cards", memEasy:"Easy", memHard:"Hard", bestLevel:n=>`Best level: ${n}`, bestScore:n=>`Best score: ${n}`, none:"Not played yet",
+    memPick:"How many cards?", cards:"cards", memEasy:"Easy", memHard:"Hard", bestLevel:n=>`Best level: ${n}`,
+    simPick:"How many colors?", colors:"colors", fast:"Double speed", normalSpeed:"Normal speed", bestSimMode:(n,m)=>`Best level (${m}): ${n}`, bestScore:n=>`Best score: ${n}`, none:"Not played yet",
     back:"Back", start:"Start", again:"Play again", home:"Games",
     watch:"Watch…", yourTurn:"Your turn!", oops:"Oh no! Round over",
     win:"Great job!", got:n=>`You earned ${n} star${n==1?"":"s"}`, newBest:"New record! 🎉",
@@ -514,7 +520,7 @@ function hubView(){
     <h2>${t("games")}</h2>
     <div class="games">
       <button class="game g-mem" data-g="g-mem"><span class="ico">🃏</span><span class="t">${t("mem")}</span><span class="d">${t("memD")}</span><span class="best">${(()=>{ const n=memSize(), v=memBest(b,n); return v?t("bestMemSize")(num(v),num(n)):t("none"); })()}</span></button>
-      <button class="game g-sim" data-g="g-sim"><span class="ico">🎨</span><span class="t">${t("sim")}</span><span class="d">${t("simD")}</span><span class="best">${b.sim?t("bestLevel")(num(b.sim)):t("none")}</span></button>
+      <button class="game g-sim" data-g="g-sim"><span class="ico">🎨</span><span class="t">${t("sim")}</span><span class="d">${t("simD")}</span><span class="best">${(()=>{ const m=simMode(), v=simBest(b,m.key); return v?t("bestSimMode")(num(v),simLabel(m)):t("none"); })()}</span></button>
       <button class="game g-tap" data-g="g-tap"><span class="ico">🌟</span><span class="t">${t("tap")}</span><span class="d">${t("tapD")}</span><span class="best">${b.tap?t("bestScore")(num(b.tap)):t("none")}</span></button>
     </div>
     <h2>${t("soon")}</h2>
@@ -539,7 +545,7 @@ const bindBack = () => { $("#back").onclick=()=>go("hub"); };
 function reward(game, value, better, stars, line){
   const k = cur(); if(!k) return;
   k.best = k.best||{};
-  const prev = game.startsWith("mem") ? memBest(k.best, +game.slice(3)) : k.best[game];
+  const prev = game.startsWith("mem") ? memBest(k.best, +game.slice(3)) : game.startsWith("sim") ? simBest(k.best, game) : k.best[game];
   const isBest = prev==null || better(value,prev);
   if(isBest) k.best[game]=value;
   k.stars = (k.stars||0)+stars;
@@ -556,7 +562,7 @@ function reward(game, value, better, stars, line){
     <div class="row"><button class="big" id="again">${t("again")}</button><button class="ghost soft" id="toHub">${t("home")}</button></div>
   </div></div>`;
   $("#again").onclick=()=>{ $("#layer").innerHTML=""; go(view); };
-  $("#toHub").onclick=()=>{ memAgain=false; $("#layer").innerHTML=""; go("hub"); };
+  $("#toHub").onclick=()=>{ memAgain=false; simAgain=false; $("#layer").innerHTML=""; go("hub"); };
 }
 
 // ================= game 1: memory =================
@@ -617,39 +623,68 @@ function playMemory(n){
 }
 
 // ================= game 2: color challenge =================
+const SIM_NOTES=[523,587,659,698,784,880,988,1047];
+const simMode=()=>{ const pads=LS.get("nj_simpads",4)===8?8:4, fast=!!LS.get("nj_simfast",false);
+  return {pads, fast, key:"sim"+pads+(fast?"f":"")}; };
+const simLabel=m=>`${num(m.pads)} ${t("colors")}${m.fast?" ⚡":""}`;
+// Best level is kept per mode. The old record (before modes existed) counts as 4 colors, normal speed.
+const simBest=(b,key)=>b[key] || (key==="sim4" ? b.sim : null);
+let simAgain=false;
+
 function startSimon(){
   bindBack();
-  const notes=[523,659,784,988];
+  if(simAgain){ simAgain=false; playSimon(simMode()); return; }
+  $("#hud").innerHTML="";
+  let m=simMode();
+  const b=(cur()||{}).best||{};
+  const draw=()=>{
+    $("#stage").innerHTML=`<div class="msg">${t("simPick")}</div>
+      <div class="modes">${[4,8].map(n=>{ const key="sim"+n+(m.fast?"f":""), best=simBest(b,key);
+        return `<button class="size mode${n===m.pads?" chosen":""}" data-p="${n}">
+          <span class="sz-n">${num(n)}</span><span class="sz-l">${t("colors")}</span>
+          <span class="dotrow" aria-hidden="true">${Array.from({length:n},(_,i)=>`<i style="background:var(--c${i})"></i>`).join("")}</span>
+          ${best?`<span class="sz-b">🏆 ${num(best)}</span>`:""}</button>`; }).join("")}</div>
+      <button class="speed${m.fast?" on":""}" id="speed" aria-pressed="${m.fast}">⚡ ${t("fast")}</button>
+      <button class="big" id="go">${t("start")}</button>`;
+    document.querySelectorAll(".mode").forEach(btn=>btn.onclick=()=>{ LS.set("nj_simpads",+btn.dataset.p); m=simMode(); tone(660,.08,"triangle"); draw(); });
+    $("#speed").onclick=()=>{ LS.set("nj_simfast",!m.fast); m=simMode(); tone(m.fast?990:520,.1,"triangle"); draw(); };
+    $("#go").onclick=()=>playSimon(m);
+  };
+  draw();
+}
+
+function playSimon(m){
+  const n=m.pads, sp=m.fast?.5:1;
   let seq=[],pos=0,timers=[],alive=true;
   cleanup=()=>{alive=false;timers.forEach(clearTimeout)};
-  const hud=()=>$("#hud").innerHTML=`<span class="pill">${t("level")}: ${num(Math.max(seq.length,1))}</span>`;
-  $("#stage").innerHTML=`<div class="msg" id="msg">${t("simD")}</div>
-    <div class="simon wait" id="simon">${[0,1,2,3].map(i=>`<button class="pad" data-i="${i}" aria-label="${i+1}"></button>`).join("")}</div>
-    <button class="big" id="go">${t("start")}</button>`;
+  const hud=()=>$("#hud").innerHTML=`<span class="pill">${simLabel(m)}</span><span class="pill">${t("level")}: ${num(Math.max(seq.length,1))}</span>`;
+  $("#stage").innerHTML=`<div class="msg" id="msg">${t("watch")}</div>
+    <div class="simon wait p${n}" id="simon">${Array.from({length:n},(_,i)=>`<button class="pad" data-i="${i}" style="--pc:var(--c${i})" aria-label="${i+1}"></button>`).join("")}</div>`;
   hud();
   const pads=[...document.querySelectorAll(".pad")], board=$("#simon"), msg=$("#msg");
-  const flash=(i,d=380)=>{pads[i].classList.add("lit");tone(notes[i],d/1000,"sine",.22);timers.push(setTimeout(()=>pads[i].classList.remove("lit"),d))};
+  const flash=(i,d)=>{pads[i].classList.add("lit");tone(SIM_NOTES[i],d/1000,"sine",.22);timers.push(setTimeout(()=>pads[i].classList.remove("lit"),d))};
   function next(){
-    seq.push(Math.floor(Math.random()*4)); pos=0; hud();
+    seq.push(Math.floor(Math.random()*n)); pos=0; hud();
     board.classList.add("wait"); msg.textContent=t("watch");
-    const gap=Math.max(320,650-seq.length*25);
-    seq.forEach((p,i)=>timers.push(setTimeout(()=>alive&&flash(p,gap*.65),600+i*gap)));
-    timers.push(setTimeout(()=>{if(!alive)return;board.classList.remove("wait");msg.textContent=t("yourTurn")},600+seq.length*gap));
+    const gap=Math.max(320,650-seq.length*25)*sp, lead=600*sp;
+    seq.forEach((p,i)=>timers.push(setTimeout(()=>alive&&flash(p,gap*.65),lead+i*gap)));
+    timers.push(setTimeout(()=>{if(!alive)return;board.classList.remove("wait");msg.textContent=t("yourTurn")},lead+seq.length*gap));
   }
   pads.forEach(p=>p.onclick=()=>{
-    const i=+p.dataset.i; flash(i,220);
+    const i=+p.dataset.i; flash(i,220*sp);
     if(i!==seq[pos]){
       board.classList.add("wait"); msg.textContent=t("oops"); tone(180,.4,"sawtooth",.12);
       const lvl=seq.length-1;
-      if(lvl<1){ timers.push(setTimeout(()=>alive&&go("g-sim"),1200)); return; }
-      const s=Math.min(5,Math.max(1,Math.ceil(lvl/2)));
-      timers.push(setTimeout(()=>alive&&reward("sim",lvl,(v,p)=>v>p,s,`${t("level")}: ${num(lvl)}`),900));
+      if(lvl<1){ timers.push(setTimeout(()=>{ if(alive){ simAgain=true; go("g-sim"); } },1200)); return; }
+      // Stars grow with the level reached; 8 colors and double speed each add one (max 5).
+      const s=Math.min(5,Math.max(1,Math.ceil(lvl/2)+(n===8?1:0)+(m.fast?1:0)));
+      timers.push(setTimeout(()=>{ if(alive){ simAgain=true; reward(m.key,lvl,(v,p)=>v>p,s,`${simLabel(m)} · ${t("level")}: ${num(lvl)}`); } },900));
       return;
     }
     pos++;
-    if(pos===seq.length){ board.classList.add("wait"); timers.push(setTimeout(()=>alive&&next(),700)); }
+    if(pos===seq.length){ board.classList.add("wait"); timers.push(setTimeout(()=>alive&&next(),700*sp)); }
   });
-  $("#go").onclick=e=>{e.currentTarget.hidden=true;next()};
+  timers.push(setTimeout(()=>alive&&next(),300));
 }
 
 // ================= game 3: star catcher =================
