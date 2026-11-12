@@ -162,6 +162,9 @@ h2{font-size:1.4rem;font-weight:800}
 .key:active{transform:translateY(3px);box-shadow:0 1px 0 #ddd3ff}
 .key-x{background:none;box-shadow:none;font-size:1.5rem;color:#7a6fa3}
 .pinrow{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:700;font-size:1.1rem}
+.login{margin:8px auto 0;gap:10px}
+.login .lbl{align-self:stretch;text-align:start;font-weight:700;margin-bottom:-4px}
+.login input{font-size:1.15rem;text-align:left}
 .code{font-family:ui-monospace,Menlo,monospace;font-size:1.25rem;letter-spacing:.06em;background:#f3efff;border-radius:14px;padding:10px 14px;direction:ltr;user-select:all;-webkit-user-select:all;word-break:break-all}
 .small{font-size:.95rem;color:#5a4f80;margin:0}
 .section{width:100%;display:flex;flex-direction:column;gap:8px;align-items:center;padding-top:10px;border-top:2px solid #f1ecff}
@@ -207,10 +210,12 @@ const T = {
     defName:"اسم البنت", lang:"English",
     syncOn:"متزامن", syncOff:"بدون مزامنة", syncWait:"يتصل…",
     settings:"إعدادات الأب", close:"إغلاق",
-    famCode:"رمز العائلة", famCodeNote:"احفظ هذا الرمز في مكان آمن. به ترجع النجوم لو تغيّر الجهاز.",
-    copy:"نسخ", copied:"تم النسخ ✓", famLink:"رابط لجهاز ثاني", famLinkNote:"افتح هذا الرابط من جوالك عشان تشوف نفس النجوم.",
-    join:"عندي رمز عائلة", joinBtn:"انضمام", joinBad:"الرمز لازم يكون ٢٠ حرف أو أكثر",
-    syncErr:"المزامنة متوقفة: تأكد من قواعد الأمان وتفعيل Anonymous في Firebase. النجوم محفوظة على هذا الجهاز.",
+    loginTitle:"دخول الأب", loginSub:"مرة وحدة بس على هذا الجهاز، وبعدها يتذكرك.",
+    email:"الإيميل", password:"كلمة السر", loginBtn:"دخول", loggingIn:"يدخل…",
+    loginBad:"الإيميل أو كلمة السر غلط", loginNet:"ما فيه اتصال بالإنترنت. جرب مرة ثانية.", loginErr:"ما ضبط الدخول. جرب مرة ثانية.",
+    forgot:"نسيت كلمة السر", forgotNeedEmail:"اكتب إيميلك فوق أول", forgotSent:"أرسلنا رابط تغيير كلمة السر لإيميلك",
+    account:"الحساب", signedAs:"داخل باسم", logout:"تسجيل خروج من هذا الجهاز", logoutSure:"متأكد؟ اضغط مرة ثانية",
+    syncErr:"المزامنة متوقفة: تأكد من قواعد الأمان في Firebase. النجوم محفوظة على هذا الجهاز.",
     syncNoNet:"ما فيه اتصال. النجوم محفوظة على الجهاز وبتترفع لما يرجع النت.",
     guest:"ضيف", guestBtn:"العب كضيف", guestHi:"نجوم الضيف للتجربة بس، وتتصفّر أول ما تطلع.",
     pinEnter:"اكتبي كلمة السر", pinNew:"اختاري كلمة سر من ٤ أرقام", pinAgain:"اكتبيها مرة ثانية للتأكيد",
@@ -238,10 +243,12 @@ const T = {
     defName:"Name", lang:"العربية",
     syncOn:"Synced", syncOff:"Not syncing", syncWait:"Connecting…",
     settings:"Parent settings", close:"Close",
-    famCode:"Family code", famCodeNote:"Keep this code somewhere safe. It brings the stars back on a new device.",
-    copy:"Copy", copied:"Copied ✓", famLink:"Link for another device", famLinkNote:"Open this link on your phone to see the same stars.",
-    join:"I have a family code", joinBtn:"Join", joinBad:"The code must be at least 20 characters",
-    syncErr:"Sync is off: check the security rules and that Anonymous sign-in is on in Firebase. Stars are saved on this device.",
+    loginTitle:"Parent sign-in", loginSub:"Only once on this device. It remembers you after that.",
+    email:"Email", password:"Password", loginBtn:"Sign in", loggingIn:"Signing in…",
+    loginBad:"Wrong email or password", loginNet:"No internet connection. Try again.", loginErr:"Sign-in didn't work. Try again.",
+    forgot:"Forgot password", forgotNeedEmail:"Type your email above first", forgotSent:"We sent a password reset link to your email",
+    account:"Account", signedAs:"Signed in as", logout:"Sign out of this device", logoutSure:"Sure? Tap again",
+    syncErr:"Sync is off: check the security rules in Firebase. Stars are saved on this device.",
     syncNoNet:"No connection. Stars are saved on this device and will upload when you're back online.",
     guest:"Guest", guestBtn:"Play as a guest", guestHi:"Guest stars are just for trying out. They reset when you leave.",
     pinEnter:"Enter your password", pinNew:"Choose a 4-digit password", pinAgain:"Type it again to confirm",
@@ -260,19 +267,13 @@ const LS = {
   get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},
   set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 };
-function newCode(){
-  const A="abcdefghjkmnpqrstuvwxyz23456789"; const r=new Uint32Array(24);
-  crypto.getRandomValues(r); return Array.from(r,x=>A[x%A.length]).join("");
-}
-const validCode = c => typeof c==="string" && /^[a-z0-9]{20,64}$/.test(c);
 
 let lang = LS.get("nj_lang","ar");
 const t = k => T[lang][k];
-let fam = LS.get("nj_family",null);
-const hashCode = (location.hash.match(/f=([a-z0-9]+)/)||[])[1];
-if(validCode(hashCode)){ fam = hashCode; LS.set("nj_kids",null); history.replaceState(null,"",location.pathname); }
-if(!validCode(fam)) fam = newCode();
-LS.set("nj_family",fam);
+// Data lives under the parent's own Firebase account: users/{uid}/kids/{kidId}.
+// The rules let only that account read or write it.
+let uid = null;
+let signedIn = LS.get("nj_signed", false);   // remembered so a signed-in device opens straight to the girls
 
 const defaults = () => ([
   {id:"k1",name:"عزيزة",avatar:"🦄",color:"#ffb3d4",stars:0,best:{}},
@@ -294,7 +295,7 @@ function ensureRoster(list){
 }
 let kids = ensureRoster(LS.get("nj_kids",null)).list;
 let currentId = null;   // every launch starts at the profile picker, so the password is always asked
-let view = "who";
+let view = signedIn ? "who" : "login";
 let guest = null;       // guest profile lives in memory only and is never saved
 let cleanup = null;
 let sync = "wait"; // wait | on | off | nonet
@@ -306,18 +307,19 @@ const isGuest = () => currentId==="guest";
 const cur = () => isGuest() ? guest : kids.find(k=>k.id===currentId);
 const clean = k => { const o={name:String(k.name||"").slice(0,20),avatar:k.avatar,color:k.color,stars:Math.max(0,k.stars|0),best:k.best||{}}; if(k.pin) o.pin=k.pin; return o; };
 async function hashPin(id,pin){
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(fam+":"+id+":"+pin));
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("najmat:"+id+":"+pin));
   return Array.from(new Uint8Array(buf),b=>b.toString(16).padStart(2,"0")).join("");
 }
 
 // ---- writes (local first, cloud when available) ----
-function cloudSet(k){ if(F) F.setDoc(F.doc(F.db,"families",fam,"kids",k.id), clean(k)).catch(onCloudError); }
+const kidRef = id => F.doc(F.db,"users",uid,"kids",id);
+function cloudSet(k){ if(F) F.setDoc(kidRef(k.id), clean(k)).catch(onCloudError); }
 function cloudReward(k,stars,game,value,isBest){
   if(!F) return;
   const patch={stars:F.increment(stars)}; if(isBest) patch["best."+game]=value;
-  F.updateDoc(F.doc(F.db,"families",fam,"kids",k.id),patch).catch(()=>cloudSet(k));
+  F.updateDoc(kidRef(k.id),patch).catch(()=>cloudSet(k));
 }
-function cloudDelete(id){ if(F) F.deleteDoc(F.doc(F.db,"families",fam,"kids",id)).catch(onCloudError); }
+function cloudDelete(id){ if(F) F.deleteDoc(kidRef(id)).catch(onCloudError); }
 function onCloudError(e){ console.warn(e); setSync(e&&e.code==="unavailable"?"nonet":"off"); }
 
 // ================= sound =================
@@ -344,7 +346,7 @@ function applyLang(){
   document.documentElement.dir = lang==="ar"?"rtl":"ltr";
   document.title = t("app");
 }
-function go(v){ if(cleanup){cleanup();cleanup=null} if(v==="who"){ currentId=null; guest=null; } view=v; render(); window.scrollTo(0,0); }
+function go(v){ if(cleanup){cleanup();cleanup=null} if(v==="who"||v==="login"){ currentId=null; guest=null; $("#layer").innerHTML=""; } view=v; render(); window.scrollTo(0,0); }
 function setSync(s){ sync=s; const el=$("#syncPill"); if(el){ el.className="pill sync "+(s==="on"?"on":s==="wait"?"":"off"); el.lastChild.textContent=" "+syncLabel(); } }
 const syncLabel = () => sync==="on"?t("syncOn"):sync==="wait"?t("syncWait"):t("syncOff");
 
@@ -352,8 +354,8 @@ const logo = `<svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><path d="
 
 function topBar(){
   const k = cur();
-  return `<div class="bar${view==="who"?" bar-who":""}">
-    ${view==="who" ? "" : `<div class="brand">${logo}<span>${t("app")}</span></div>`}
+  return `<div class="bar${view==="who"||view==="login"?" bar-who":""}">
+    ${view==="who"||view==="login" ? "" : `<div class="brand">${logo}<span>${t("app")}</span></div>`}
     <div class="bar-actions">
       ${k && view!=="who" ? `<span class="pill starcount">⭐ ${num(k.stars||0)}</span>`:""}
       ${view==="who" ? `<span class="pill sync ${sync==="on"?"on":sync==="wait"?"":"off"}" id="syncPill"><i></i> ${syncLabel()}</span>`:""}
@@ -367,16 +369,18 @@ function render(){
   applyLang();
   const app = $("#app");
   if(view==="hub" && !cur()) view="who";
-  if(view==="who") app.innerHTML = topBar()+whoView();
+  if(view==="login") app.innerHTML = topBar()+loginView();
+  else if(view==="who") app.innerHTML = topBar()+whoView();
   else if(view==="hub") app.innerHTML = topBar()+hubView();
   else app.innerHTML = topBar()+gameShell();
   $("#langBtn").onclick = () => { lang = lang==="ar"?"en":"ar"; LS.set("nj_lang",lang); if(view.startsWith("g-")) go("hub"); else render(); };
   // Parent settings are hidden: press and hold the big title for 2 seconds.
-  const ht = $(".hero-title");
+  const ht = view==="who" && $(".hero-title");
   if(ht){ let lp=null; const stop=()=>clearTimeout(lp);
     ht.onpointerdown=()=>{ stop(); lp=setTimeout(()=>{ tone(440,.15,"triangle"); openSettings(); },2000); };
     ht.onpointerup=stop; ht.onpointerleave=stop; ht.onpointercancel=stop;
     ht.oncontextmenu=e=>e.preventDefault(); }
+  if(view==="login") bindLogin();
   if(view==="who") bindWho();
   if(view==="hub") bindHub();
   if(view==="g-mem") startMemory();
@@ -386,6 +390,46 @@ function render(){
 function refreshStars(){
   const k=cur(), sc=document.querySelector(".starcount");
   if(sc&&k) sc.textContent=`⭐ ${num(k.stars||0)}`;
+}
+
+function loginView(){
+  return `<header class="hero">
+      <div class="hero-title">${t("app")}</div>
+      <div class="hero-stars" aria-hidden="true"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div>
+    </header>
+    <form class="sheet login" id="loginForm">
+      <h2>🔐 ${t("loginTitle")}</h2>
+      <p class="small">${t("loginSub")}</p>
+      <label for="em" class="lbl">${t("email")}</label>
+      <input id="em" type="email" dir="ltr" autocomplete="username" autocapitalize="off" spellcheck="false" required>
+      <label for="pw" class="lbl">${t("password")}</label>
+      <input id="pw" type="password" dir="ltr" autocomplete="current-password" required>
+      <p class="pin-msg" id="loginMsg"></p>
+      <button class="big" type="submit" id="loginBtn">${t("loginBtn")}</button>
+      <button class="danger" type="button" id="forgot">${t("forgot")}</button>
+    </form>`;
+}
+function bindLogin(){
+  const msg=$("#loginMsg"), btn=$("#loginBtn");
+  $("#loginForm").onsubmit=async e=>{
+    e.preventDefault();
+    if(!A){ msg.textContent=t("loginNet"); return; }
+    btn.disabled=true; btn.textContent=t("loggingIn"); msg.textContent="";
+    try{ await A.signIn(A.auth, $("#em").value.trim(), $("#pw").value); }
+    catch(err){
+      const c=(err&&err.code)||"";
+      msg.textContent = c.includes("network") ? t("loginNet")
+        : /invalid|wrong-password|user-not-found|invalid-email/.test(c) ? t("loginBad") : t("loginErr");
+      btn.disabled=false; btn.textContent=t("loginBtn");
+    }
+  };
+  $("#forgot").onclick=async()=>{
+    const em=$("#em").value.trim();
+    if(!em){ msg.textContent=t("forgotNeedEmail"); return; }
+    if(!A){ msg.textContent=t("loginNet"); return; }
+    try{ await A.reset(A.auth, em); msg.style.color="#1f8a5b"; msg.textContent=t("forgotSent"); }
+    catch(err){ msg.textContent=t("loginErr"); }
+  };
 }
 
 function whoView(){
@@ -661,34 +705,22 @@ function openPin(kid, mode, onDone){
 
 // ================= parent settings =================
 function openSettings(){
-  const link = location.origin + location.pathname + "#f=" + fam;
   $("#layer").innerHTML=`<div class="overlay"><div class="sheet" role="dialog" aria-modal="true">
     <h2>⚙️ ${t("settings")}</h2>
     <p class="small">${sync==="on"?"🟢 "+t("syncOn"):sync==="nonet"?"📡 "+t("syncNoNet"):sync==="off"?"⚠️ "+t("syncErr"):"⏳ "+t("syncWait")}</p>
-    <div class="section"><b>${t("famCode")}</b><div class="code" id="fc">${fam}</div><p class="small">${t("famCodeNote")}</p>
-      <button class="ghost soft" data-copy="${fam}">${t("copy")}</button></div>
-    <div class="section"><b>${t("famLink")}</b><div class="code" style="font-size:.9rem">${esc(link)}</div><p class="small">${t("famLinkNote")}</p>
-      <button class="ghost soft" data-copy="${esc(link)}">${t("copy")}</button></div>
-    <form class="section" id="joinForm"><b>${t("join")}</b>
-      <input id="joinCode" autocomplete="off" autocapitalize="off" spellcheck="false" dir="ltr" placeholder="abcd…">
-      <p class="small" id="joinMsg"></p>
-      <button class="ghost soft" type="submit">${t("joinBtn")}</button></form>
     <div class="section"><b>🔒 ${t("pins")}</b><p class="small">${t("pinResetNote")}</p>
       ${kids.map(k=>`<div class="pinrow"><span>${esc(k.avatar)} ${esc(kidName(k))}</span>${k.pin
         ?`<button class="ghost soft" data-reset="${esc(k.id)}">${t("pinReset")}</button>`
         :`<span class="small">${t("pinNone")}</span>`}</div>`).join("")}</div>
+    <div class="section"><b>👤 ${t("account")}</b>
+      <p class="small">${t("signedAs")}: <span dir="ltr">${esc(A&&A.auth.currentUser?A.auth.currentUser.email:"")}</span></p>
+      <button class="danger" id="logout">${t("logout")}</button></div>
     <button class="big" id="closeS">${t("close")}</button>
   </div></div>`;
-  document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=async()=>{
-    try{ await navigator.clipboard.writeText(b.dataset.copy); b.textContent=t("copied"); }
-    catch(e){ const r=document.createRange(); r.selectNodeContents(b.previousElementSibling.previousElementSibling); const s=getSelection(); s.removeAllRanges(); s.addRange(r); }
-  });
-  $("#joinForm").onsubmit=e=>{
-    e.preventDefault();
-    const c=$("#joinCode").value.trim().toLowerCase().replace(/[^a-z0-9]/g,"");
-    if(!validCode(c)){ $("#joinMsg").textContent=t("joinBad"); return; }
-    fam=c; LS.set("nj_family",fam); kids=[]; cacheKids(); currentId=null;
-    $("#layer").innerHTML=""; view="who"; render(); listen();
+  $("#logout").onclick=e=>{
+    const b=e.currentTarget;
+    if(!b.dataset.armed){ b.dataset.armed="1"; b.textContent=t("logoutSure"); return; }
+    $("#layer").innerHTML=""; if(A) A.signOut(A.auth);
   };
   document.querySelectorAll("[data-reset]").forEach(b=>b.onclick=()=>{
     if(!b.dataset.armed){ b.dataset.armed="1"; b.textContent=t("pinResetSure"); return; }
@@ -704,11 +736,20 @@ function listen(){
   if(!F) return;
   if(unsub) unsub();
   seeded=false; setSync("wait");
-  const col = F.collection(F.db,"families",fam,"kids");
+  const col = F.collection(F.db,"users",uid,"kids");
   unsub = F.onSnapshot(col,{includeMetadataChanges:true}, snap=>{
     const fromServer = !snap.metadata.fromCache;
     if(fromServer) setSync("on");
     if(snap.empty && !fromServer) return;
+    if(snap.empty){
+      // First sign-in on this account: carry over this device's girls and stars.
+      // Old passwords can't move across (they were tied to the old setup), so each girl picks a new one.
+      if(seeded) return; seeded=true;
+      kids = ensureRoster(kids).list.map(k=>{ const c={...k}; delete c.pin; return c; });
+      kids.forEach(cloudSet); cacheKids();
+      if(!view.startsWith("g-") && !$("#layer").innerHTML) render();
+      return;
+    }
     const r = ensureRoster(snap.docs.map(d=>({id:d.id,...d.data()})));
     kids = r.list;
     if(fromServer && !seeded){ seeded=true; r.fixes.forEach(cloudSet); }
@@ -717,21 +758,31 @@ function listen(){
     else if(!$("#layer").innerHTML) render();
   }, err=>{ onCloudError(err); unsub=null; render(); });
 }
+let A = null;   // auth handles
 async function startCloud(){
   try{
-    const [{initializeApp},{getAuth,signInAnonymously,onAuthStateChanged},fs] = await Promise.all([
+    const [{initializeApp},au,fs] = await Promise.all([
       import(FB+"firebase-app.js"), import(FB+"firebase-auth.js"), import(FB+"firebase-firestore.js")
     ]);
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    const auth = au.getAuth(app);
+    A = {auth, signIn:au.signInWithEmailAndPassword, signOut:au.signOut, reset:au.sendPasswordResetEmail};
     let db;
     try{ db = fs.initializeFirestore(app,{localCache:fs.persistentLocalCache()}); }
     catch(e){ db = fs.getFirestore(app); }
-    onAuthStateChanged(auth, user=>{
-      if(!user){ signInAnonymously(auth).catch(e=>{ console.warn(e); setSync(navigator.onLine?"off":"nonet"); if(view==="who") render(); }); return; }
-      if(F) return;
+    au.onAuthStateChanged(auth, user=>{
+      if(user && user.isAnonymous){ au.signOut(auth); return; }   // left over from the old setup
+      if(!user){
+        if(unsub){ unsub(); unsub=null; }
+        F=null; uid=null; signedIn=false; LS.set("nj_signed",false);
+        if(view!=="login"){ go("login"); }
+        return;
+      }
+      if(F && uid===user.uid) return;
+      uid=user.uid; signedIn=true; LS.set("nj_signed",true);
       F = {db, doc:fs.doc, collection:fs.collection, setDoc:fs.setDoc, updateDoc:fs.updateDoc, deleteDoc:fs.deleteDoc, onSnapshot:fs.onSnapshot, increment:fs.increment};
       listen();
+      if(view==="login") go("who");
     });
   }catch(e){
     console.warn("Firebase not loaded", e);
