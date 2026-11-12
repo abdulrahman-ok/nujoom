@@ -494,7 +494,7 @@ function hubView(){
       <div class="face" style="--c:${k.color}" aria-hidden="true">${esc(k.avatar)}</div>
       <div><h1>${t("hi")} ${esc(kidName(k))}</h1><p class="sub">${isGuest()?"👤 "+t("guestHi"):t("hiSub")}</p></div>
     </div>
-    <div class="row" style="justify-content:flex-start"><button class="ghost" id="switch">↩︎ ${t("who")}</button></div>
+    <div class="row" style="justify-content:flex-start"><button class="ghost" id="switch">${lang==="ar"?"→":"←"} ${t("backBtn")}</button></div>
     <h2>${t("games")}</h2>
     <div class="games">
       <button class="game g-mem" data-g="g-mem"><span class="ico">🃏</span><span class="t">${t("mem")}</span><span class="d">${t("memD")}</span><span class="best">${b.mem?t("bestMoves")(num(b.mem)):t("none")}</span></button>
