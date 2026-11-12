@@ -99,13 +99,26 @@ h2{font-size:1.4rem;font-weight:800}
 .hud{display:flex;gap:8px;flex-wrap:wrap}
 .stage{background:rgba(255,255,255,.1);border-radius:28px;padding:16px;min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;position:relative;overflow:hidden}
 
-.mem{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%;max-width:560px}
+.mem{--gap:clamp(5px,1.2vw,12px);display:grid;grid-template-columns:repeat(var(--cols,4),1fr);gap:var(--gap);
+  width:min(100%, 640px, calc((100vh - 230px) * var(--cols,4) / var(--rows,3)))}
+.mem .card,.mem .card .f,.mem .card .b{border-radius:calc(var(--cw,80px) * .2)}
+.mem .card .b{font-size:calc(var(--cw,80px) * .45)}
+.mem .card .f{font-size:calc(var(--cw,80px) * .62)}
+.sizes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;width:min(100%,520px)}
+.size{background:var(--card);color:var(--card-ink);border-radius:22px;padding:14px 8px 12px;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 6px 0 #c9b8f0;position:relative}
+.size:active{transform:translateY(4px);box-shadow:0 2px 0 #c9b8f0}
+.size.chosen{outline:4px solid var(--star);outline-offset:2px}
+.sz-n{font-size:2.2rem;font-weight:800;line-height:1}
+.sz-l{font-size:1rem;font-weight:700;opacity:.7}
+.sz-s{font-size:.85rem;letter-spacing:1px}
+.sz-b{font-size:.85rem;font-weight:700;color:#8a5a00}
+.sz-scale{display:flex;justify-content:space-between;width:min(100%,520px);color:var(--ink-soft);font-weight:700}
 .card{aspect-ratio:1;max-width:100%;border-radius:20px;perspective:600px;background:none;padding:0}
 .card .in{position:relative;display:block;width:100%;height:100%;transition:transform .35s;transform-style:preserve-3d}
 .card.up .in,.card.done .in{transform:rotateY(180deg)}
 .card .f,.card .b{position:absolute;inset:0;border-radius:20px;display:grid;place-items:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.card .b{background:var(--star);box-shadow:inset 0 -6px 0 var(--star-deep);font-size:clamp(28px,6vw,44px);color:var(--card-ink)}
-.card .f{background:var(--card);transform:rotateY(180deg);font-size:clamp(34px,8vw,58px)}
+.card .b{background:var(--star);box-shadow:inset 0 -6px 0 var(--star-deep);color:var(--card-ink)}
+.card .f{background:var(--card);transform:rotateY(180deg)}
 .card.done .f{background:#d8ffe9}
 
 .simon{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:min(420px,100%)}
@@ -175,7 +188,7 @@ h2{font-size:1.4rem;font-weight:800}
 .small{font-size:.95rem;color:#5a4f80;margin:0}
 .section{width:100%;display:flex;flex-direction:column;gap:8px;align-items:center;padding-top:10px;border-top:2px solid #f1ecff}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-@media (max-width:480px){.mem{gap:8px}.kids{gap:10px}.kid .face{width:58px;height:58px;font-size:34px}.kid .name{font-size:1.1rem}}
+@media (max-width:480px){.kids{gap:10px}.kid .face{width:58px;height:58px;font-size:34px}.kid .name{font-size:1.1rem}}
 </style>
 </head>
 <body>
@@ -207,7 +220,8 @@ const T = {
     tasks:"مهامي اليومية", tasksD:"رتبي غرفتك واكسبي نجوم",
     learn:"تعلّم والعب", learnD:"رياضيات وإنجليزي بنجوم أكثر",
     moves:"حركات", pairs:"أزواج", level:"المستوى", score:"النقاط",
-    bestMoves:n=>`أفضل نتيجة: ${n} حركة`, bestLevel:n=>`أعلى مستوى: ${n}`, bestScore:n=>`أعلى نقاط: ${n}`, none:"ما لعبتيها لسا",
+    bestMoves:n=>`أفضل نتيجة: ${n} حركة`, bestMemSize:(n,c)=>`أفضل نتيجة (${c} بطاقة): ${n} حركة`,
+    memPick:"كم بطاقة تبين؟", cards:"بطاقة", memEasy:"سهلة", memHard:"صعبة", bestLevel:n=>`أعلى مستوى: ${n}`, bestScore:n=>`أعلى نقاط: ${n}`, none:"ما لعبتيها لسا",
     back:"رجوع", start:"ابدئي", again:"مرة ثانية", home:"الألعاب",
     watch:"ركّزي…", yourTurn:"دورك!", oops:"أوه! خلص الدور",
     win:"برافو!", got:n=>`كسبتي ${n} نجوم`, newBest:"رقم قياسي جديد! 🎉",
@@ -250,7 +264,8 @@ const T = {
     tasks:"My Daily Tasks", tasksD:"Tidy your room and earn stars",
     learn:"Learn & Play", learnD:"Math and Arabic for even more stars",
     moves:"Moves", pairs:"Pairs", level:"Level", score:"Score",
-    bestMoves:n=>`Best: ${n} moves`, bestLevel:n=>`Best level: ${n}`, bestScore:n=>`Best score: ${n}`, none:"Not played yet",
+    bestMoves:n=>`Best: ${n} moves`, bestMemSize:(n,c)=>`Best (${c} cards): ${n} moves`,
+    memPick:"How many cards?", cards:"cards", memEasy:"Easy", memHard:"Hard", bestLevel:n=>`Best level: ${n}`, bestScore:n=>`Best score: ${n}`, none:"Not played yet",
     back:"Back", start:"Start", again:"Play again", home:"Games",
     watch:"Watch…", yourTurn:"Your turn!", oops:"Oh no! Round over",
     win:"Great job!", got:n=>`You earned ${n} star${n==1?"":"s"}`, newBest:"New record! 🎉",
@@ -498,7 +513,7 @@ function hubView(){
     <div class="row" style="justify-content:flex-start"><button class="ghost" id="switch">${lang==="ar"?"→":"←"} ${t("backBtn")}</button></div>
     <h2>${t("games")}</h2>
     <div class="games">
-      <button class="game g-mem" data-g="g-mem"><span class="ico">🃏</span><span class="t">${t("mem")}</span><span class="d">${t("memD")}</span><span class="best">${b.mem?t("bestMoves")(num(b.mem)):t("none")}</span></button>
+      <button class="game g-mem" data-g="g-mem"><span class="ico">🃏</span><span class="t">${t("mem")}</span><span class="d">${t("memD")}</span><span class="best">${(()=>{ const n=memSize(), v=memBest(b,n); return v?t("bestMemSize")(num(v),num(n)):t("none"); })()}</span></button>
       <button class="game g-sim" data-g="g-sim"><span class="ico">🎨</span><span class="t">${t("sim")}</span><span class="d">${t("simD")}</span><span class="best">${b.sim?t("bestLevel")(num(b.sim)):t("none")}</span></button>
       <button class="game g-tap" data-g="g-tap"><span class="ico">🌟</span><span class="t">${t("tap")}</span><span class="d">${t("tapD")}</span><span class="best">${b.tap?t("bestScore")(num(b.tap)):t("none")}</span></button>
     </div>
@@ -524,7 +539,7 @@ const bindBack = () => { $("#back").onclick=()=>go("hub"); };
 function reward(game, value, better, stars, line){
   const k = cur(); if(!k) return;
   k.best = k.best||{};
-  const prev = k.best[game];
+  const prev = game.startsWith("mem") ? memBest(k.best, +game.slice(3)) : k.best[game];
   const isBest = prev==null || better(value,prev);
   if(isBest) k.best[game]=value;
   k.stars = (k.stars||0)+stars;
@@ -541,18 +556,44 @@ function reward(game, value, better, stars, line){
     <div class="row"><button class="big" id="again">${t("again")}</button><button class="ghost soft" id="toHub">${t("home")}</button></div>
   </div></div>`;
   $("#again").onclick=()=>{ $("#layer").innerHTML=""; go(view); };
-  $("#toHub").onclick=()=>{ $("#layer").innerHTML=""; go("hub"); };
+  $("#toHub").onclick=()=>{ memAgain=false; $("#layer").innerHTML=""; go("hub"); };
 }
 
 // ================= game 1: memory =================
+const MEM_SIZES=[6,12,18,24,30,36];
+const MEM_COLS={6:3,12:4,18:6,24:6,30:6,36:6};
+const MEM_POOL=["🐶","🐱","🦁","🐸","🐵","🐙","🦒","🐳","🦜","🐨","🐼","🦊","🐰","🐯","🐮","🐷","🐧","🦋","🐢","🦄","🐝","🐞","🦀","🐬"];
+const memSize=()=>{ const n=LS.get("nj_memsize",12); return MEM_SIZES.includes(n)?n:12; };
+// Best moves are kept per board size. The old 12-card record (before sizes existed) counts as 12.
+const memBest=(b,n)=>b["mem"+n] || (n===12 ? b.mem : null);
+let memAgain=false;   // "Play again" skips the size picker and replays the same size
+
 function startMemory(){
   bindBack();
-  const pool=["🐶","🐱","🦁","🐸","🐵","🐙","🦒","🐳","🦜","🐨"].sort(()=>Math.random()-.5).slice(0,6);
+  if(memAgain){ memAgain=false; playMemory(memSize()); return; }
+  $("#hud").innerHTML="";
+  const b=(cur()||{}).best||{}, chosen=memSize();
+  $("#stage").innerHTML=`<div class="msg">${t("memPick")}</div>
+    <div class="sizes">${MEM_SIZES.map((n,i)=>`<button class="size${n===chosen?" chosen":""}" data-n="${n}">
+      <span class="sz-n">${num(n)}</span><span class="sz-l">${t("cards")}</span>
+      <span class="sz-s" aria-hidden="true">${"⭐".repeat(1+Math.floor(i/2))}</span>
+      ${memBest(b,n)?`<span class="sz-b">🏆 ${num(memBest(b,n))}</span>`:""}</button>`).join("")}</div>
+    <div class="sz-scale"><span>${t("memEasy")}</span><span>${t("memHard")}</span></div>`;
+  document.querySelectorAll(".size").forEach(btn=>btn.onclick=()=>{ const n=+btn.dataset.n; LS.set("nj_memsize",n); tone(660,.1,"triangle"); playMemory(n); });
+}
+
+function playMemory(n){
+  const pairs=n/2, cols=MEM_COLS[n], rows=n/cols;
+  const pool=[...MEM_POOL].sort(()=>Math.random()-.5).slice(0,pairs);
   const deck=[...pool,...pool].sort(()=>Math.random()-.5);
   let open=[],moves=0,found=0,lock=false;
-  const hud=()=>$("#hud").innerHTML=`<span class="pill">${t("moves")}: ${num(moves)}</span><span class="pill">${t("pairs")}: ${num(found)}/${num(6)}</span>`;
+  const hud=()=>$("#hud").innerHTML=`<span class="pill">${t("moves")}: ${num(moves)}</span><span class="pill">${t("pairs")}: ${num(found)}/${num(pairs)}</span>`;
   hud();
-  $("#stage").innerHTML=`<div class="mem">${deck.map((e,i)=>`<button class="card" data-i="${i}" aria-label="?"><span class="in"><span class="b">★</span><span class="f">${e}</span></span></button>`).join("")}</div>`;
+  $("#stage").innerHTML=`<div class="mem" style="--cols:${cols};--rows:${rows}">${deck.map((e,i)=>`<button class="card" data-i="${i}" aria-label="?"><span class="in"><span class="b">★</span><span class="f">${e}</span></span></button>`).join("")}</div>`;
+  const grid=$(".mem");
+  const fit=()=>{ const c=grid.querySelector(".card"); if(c) grid.style.setProperty("--cw", c.offsetWidth+"px"); };
+  fit(); addEventListener("resize",fit);
+  cleanup=()=>removeEventListener("resize",fit);
   document.querySelectorAll(".card").forEach(c=>c.onclick=()=>{
     if(lock||c.classList.contains("up")||c.classList.contains("done")) return;
     c.classList.add("up"); tone(520,.08,"triangle"); open.push(c);
@@ -561,7 +602,12 @@ function startMemory(){
     const [a,b]=open;
     if(deck[a.dataset.i]===deck[b.dataset.i]){
       setTimeout(()=>{a.classList.add("done");b.classList.add("done");tone(988,.18,"triangle");found++;hud();open=[];
-        if(found===6){ const s=moves<=9?3:moves<=13?2:1; setTimeout(()=>reward("mem",moves,(v,p)=>v<p,s,`${t("moves")}: ${num(moves)}`),500); }
+        if(found===pairs){
+          // 1-3 stars for how few moves it took, plus up to 2 more for a bigger board (max 5).
+          const r=moves/pairs, skill=r<=1.5?3:r<=2.2?2:1, size=MEM_SIZES.indexOf(n)>>1;
+          const k="mem"+n;
+          setTimeout(()=>{ memAgain=true; reward(k,moves,(v,p)=>v<p,Math.min(5,skill+size),`${num(n)} ${t("cards")} · ${t("moves")}: ${num(moves)}`); },500);
+        }
       },250);
     } else {
       lock=true;
