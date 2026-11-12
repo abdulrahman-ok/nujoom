@@ -67,7 +67,8 @@ h2{font-size:1.4rem;font-weight:800}
 .center{text-align:center}
 .center .sub{margin-top:6px}
 
-.kids{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;width:100%;max-width:620px;margin:8px auto 0}
+.kids{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;width:100%;max-width:800px;margin:8px auto 0}
+@media (max-width:600px){.kids{grid-template-columns:repeat(2,minmax(0,1fr));max-width:420px}}
 .kid{position:relative;background:var(--card);color:var(--card-ink);border-radius:24px;padding:18px 10px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;
   box-shadow:0 6px 0 var(--shade,#c9b8f0);transition:transform .15s;cursor:pointer}
 .kid:active{transform:translateY(4px);box-shadow:0 2px 0 var(--shade,#c9b8f0)}
@@ -275,7 +276,8 @@ LS.set("nj_family",fam);
 const defaults = () => ([
   {id:"k1",name:"عزيزة",avatar:"🦄",color:"#ffb3d4",stars:0,best:{}},
   {id:"k2",name:"ديمة",avatar:"🐱",color:"#b8f0dc",stars:0,best:{}},
-  {id:"k3",name:"سلمى",avatar:"🦋",color:"#bfe3ff",stars:0,best:{}}
+  {id:"k3",name:"سلمى",avatar:"🦋",color:"#bfe3ff",stars:0,best:{}},
+  {id:"k4",name:"يارا",avatar:"🐰",color:"#ffd9a8",stars:0,best:{}}
 ]);
 // The three girls always exist. A missing profile is added; an empty name is filled in.
 // Names, pictures and colors changed in the app are kept.
