@@ -248,7 +248,19 @@ const defaults = () => ([
   {id:"k2",name:"ديمة",avatar:"🐱",color:"#b8f0dc",stars:0,best:{}},
   {id:"k3",name:"سلمى",avatar:"🦋",color:"#bfe3ff",stars:0,best:{}}
 ]);
-let kids = LS.get("nj_kids",null) || defaults();
+// The three girls always exist. A missing profile is added; an empty name is filled in.
+// Names, pictures and colors changed in the app are kept.
+function ensureRoster(list){
+  const out = (list||[]).map(k=>({...k})), fixes = [];
+  for(const d of defaults()){
+    const k = out.find(x=>x.id===d.id);
+    if(!k){ out.push(d); fixes.push(d); }
+    else if(!String(k.name||"").trim()){ k.name=d.name; fixes.push(k); }
+  }
+  out.sort((a,b)=>a.id.localeCompare(b.id));
+  return {list:out, fixes};
+}
+let kids = ensureRoster(LS.get("nj_kids",null)).list;
 let currentId = LS.get("nj_current", null);
 let view = kids.find(k=>k.id===currentId) ? "hub" : "who";
 let cleanup = null;
@@ -589,11 +601,10 @@ function listen(){
   unsub = F.onSnapshot(col,{includeMetadataChanges:true}, snap=>{
     const fromServer = !snap.metadata.fromCache;
     if(fromServer) setSync("on");
-    if(snap.empty){
-      if(fromServer && !seeded){ seeded=true; if(!kids.length) kids=defaults(); kids.forEach(cloudSet); cacheKids(); }
-      return;
-    }
-    kids = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.id.localeCompare(b.id));
+    if(snap.empty && !fromServer) return;
+    const r = ensureRoster(snap.docs.map(d=>({id:d.id,...d.data()})));
+    kids = r.list;
+    if(fromServer && !seeded){ seeded=true; r.fixes.forEach(cloudSet); }
     cacheKids();
     if(view.startsWith("g-")) refreshStars();
     else if(!$("#layer").innerHTML) render();
