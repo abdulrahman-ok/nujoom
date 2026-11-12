@@ -562,7 +562,7 @@ function reward(game, value, better, stars, line){
 // ================= game 1: memory =================
 const MEM_SIZES=[6,12,18,24,30,36];
 const MEM_COLS={6:3,12:4,18:6,24:6,30:6,36:6};
-const MEM_POOL=["🐶","🐱","🦁","🐸","🐵","🐙","🦒","🐳","🦜","🐨","🐼","🦊","🐰","🐯","🐮","🐷","🐧","🦋","🐢","🦄","🐝","🐞","🦀","🐬"];
+const MEM_POOL=["🐶","🐱","🦁","🐸","🐵","🐙","🦒","🐳","🦜","🐨","🐼","🦊","🐰","🐯","🐮","🦉","🐧","🦋","🐢","🦄","🐝","🐞","🦀","🐬"];
 const memSize=()=>{ const n=LS.get("nj_memsize",12); return MEM_SIZES.includes(n)?n:12; };
 // Best moves are kept per board size. The old 12-card record (before sizes existed) counts as 12.
 const memBest=(b,n)=>b["mem"+n] || (n===12 ? b.mem : null);
