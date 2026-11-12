@@ -215,8 +215,8 @@ const T = {
     defName:"اسم البنت", lang:"English",
     syncOn:"متزامن", syncOff:"بدون مزامنة", syncWait:"يتصل…",
     settings:"إعدادات المسؤول", close:"إغلاق",
-    pendTitle:"هذا الجهاز يحتاج موافقة المسؤول", pendSub:"اكتب اسم للجهاز عشان يعرفه المسؤول، وأرسل الطلب.",
-    devName:"اسم الجهاز", devNamePh:"مثال: آيباد بيت جدتي", sendReq:"أرسل الطلب", sending:"يرسل…",
+    pendTitle:"تحتاج لموافقة", pendSub:"اكتب اسم للجهاز عشان يعرفه المسؤول، وأرسل الطلب.",
+    devName:"اسم الجهاز", devNamePh:"مثال: آيباد عبدالرحمن", sendReq:"أرسل الطلب", sending:"يرسل…",
     waiting:"بانتظار موافقة المسؤول…", reqCode:"رمز الطلب", cancelReq:"إلغاء الطلب", iAmAdmin:"أنا المسؤول",
     backBtn:"رجوع", loadingKids:"نجهّز البنات…", reqErr:"ما انرسل الطلب. تأكد من الإنترنت وجرب مرة ثانية.",
     reqs:"طلبات الأجهزة", noReqs:"ما فيه طلبات", approve:"موافقة", reject:"رفض",
@@ -258,8 +258,8 @@ const T = {
     defName:"Name", lang:"العربية",
     syncOn:"Synced", syncOff:"Not syncing", syncWait:"Connecting…",
     settings:"Admin settings", close:"Close",
-    pendTitle:"This device needs the admin's approval", pendSub:"Give this device a name so the admin recognizes it, then send the request.",
-    devName:"Device name", devNamePh:"Example: Grandma's iPad", sendReq:"Send request", sending:"Sending…",
+    pendTitle:"Approval needed", pendSub:"Give this device a name so the admin recognizes it, then send the request.",
+    devName:"Device name", devNamePh:"Example: Abdulrahman's iPad", sendReq:"Send request", sending:"Sending…",
     waiting:"Waiting for the admin to approve…", reqCode:"Request code", cancelReq:"Cancel request", iAmAdmin:"I'm the admin",
     backBtn:"Back", loadingKids:"Getting the girls ready…", reqErr:"The request wasn't sent. Check the internet and try again.",
     reqs:"Device requests", noReqs:"No requests", approve:"Approve", reject:"Decline",
@@ -470,7 +470,7 @@ function whoView(){
       <div class="hero-title">${t("app")}</div>
       <div class="hero-stars" aria-hidden="true"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div>
     </header>
-    <div class="center"><h1>${t("who")}</h1><p class="sub">${t("whoSub")}</p></div>
+    <div class="center"><p class="sub">${t("whoSub")}</p></div>
     ${kids.length?`<div class="kids">${cards}</div>`:`<p class="note" style="font-size:1.2rem">${t("loadingKids")}</p>`}
     <div class="row"><button class="guest-btn" id="guestBtn">👤 ${t("guestBtn")}</button></div>${warn}`;
 }
