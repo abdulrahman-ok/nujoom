@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>نجوم البيت</title>
+<meta name="theme-color" content="#2a1f6b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="نجوم البيت">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-512.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;700;800&display=swap">
+<style>
+:root{
+  --sky-top:#2a1f6b; --sky-bot:#6b3fa0; --ink:#fffaf0; --ink-soft:#d9cff5;
+  --star:#ffd23f; --star-deep:#f4a300; --card:#ffffff; --card-ink:#2a1f4f;
+  --pink:#ff6fae; --mint:#3ddcb0; --sky:#4cb5ff; --coral:#ff8a5c;
+  --font:"Baloo Bhaijaan 2","Geeza Pro","Arial Rounded MT Bold",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  margin:0;font-family:var(--font);color:var(--ink);
+  background:linear-gradient(180deg,var(--sky-top),var(--sky-bot)) fixed;
+  background-color:var(--sky-top);
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-top:calc(12px + env(safe-area-inset-top,0px));
+  padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));
+  overflow-x:hidden; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none;
+}
+#sky{position:fixed;inset:0;pointer-events:none;z-index:0}
+.app{position:relative;z-index:1;max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+button{font-family:inherit;cursor:pointer;border:0}
+button:focus-visible{outline:4px solid var(--star);outline-offset:3px}
+
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.6rem}
+.brand .logo{width:44px;height:44px}
+.bar-actions{display:flex;gap:8px;align-items:center}
+.pill{background:rgba(255,255,255,.14);color:var(--ink);border-radius:999px;padding:8px 16px;font-size:1.05rem;font-weight:700;display:inline-flex;align-items:center;gap:8px}
+button.pill:hover{background:rgba(255,255,255,.24)}
+.starcount{background:var(--star);color:var(--card-ink);font-variant-numeric:tabular-nums}
+.sync{font-size:.9rem;padding:6px 12px}
+.sync i{width:10px;height:10px;border-radius:50%;background:#9a8fc4;display:inline-block}
+.sync.on i{background:var(--mint)} .sync.off i{background:var(--coral)}
+
+h1,h2{margin:0;text-wrap:balance;line-height:1.2}
+h1{font-size:clamp(1.8rem,5vw,2.6rem);font-weight:800}
+h2{font-size:1.4rem;font-weight:800}
+.sub{color:var(--ink-soft);font-size:1.15rem;margin:4px 0 0}
+
+.kids{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.kid{position:relative;background:var(--card);color:var(--card-ink);border-radius:28px;padding:22px 18px 18px;display:flex;flex-direction:column;align-items:center;gap:6px;
+  box-shadow:0 8px 0 var(--shade,#c9b8f0);transition:transform .15s;cursor:pointer}
+.kid:active{transform:translateY(4px);box-shadow:0 4px 0 var(--shade,#c9b8f0)}
+.kid .face{width:110px;height:110px;border-radius:50%;display:grid;place-items:center;font-size:64px;background:var(--c)}
+.kid .name{font-size:1.7rem;font-weight:800}
+.kid .stars{font-size:1.2rem;font-weight:700;color:#8a5a00;font-variant-numeric:tabular-nums}
+.kid .edit{position:absolute;top:10px;inset-inline-end:10px;width:40px;height:40px;border-radius:50%;background:#f1ecff;color:var(--card-ink);font-size:1.1rem}
+.kid.add{background:rgba(255,255,255,.1);color:var(--ink);border:3px dashed rgba(255,255,255,.4);box-shadow:none;justify-content:center;min-height:200px;font-size:1.3rem;font-weight:700}
+.crown{position:absolute;top:-18px;font-size:34px}
+
+.hello{display:flex;align-items:center;gap:14px}
+.hello .face{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-size:38px;background:var(--c);flex:none}
+.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.game{border-radius:28px;padding:20px;color:var(--card-ink);text-align:start;display:flex;flex-direction:column;gap:6px;min-height:170px;position:relative;overflow:hidden;
+  box-shadow:0 8px 0 rgba(0,0,0,.18);transition:transform .15s}
+.game:active{transform:translateY(4px);box-shadow:0 4px 0 rgba(0,0,0,.18)}
+.game .ico{font-size:52px;line-height:1}
+.game .t{font-size:1.5rem;font-weight:800}
+.game .d{font-size:1.05rem;opacity:.8}
+.game .best{margin-top:auto;font-size:.95rem;font-weight:700;background:rgba(255,255,255,.55);align-self:flex-start;padding:3px 12px;border-radius:999px;font-variant-numeric:tabular-nums}
+.g-mem{background:#ffd9ec}.g-sim{background:#c9f5e7}.g-tap{background:#fff1b8}
+.soon{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.locked{border-radius:24px;padding:16px 18px;border:2px dashed rgba(255,255,255,.35);display:flex;gap:12px;align-items:center;color:var(--ink-soft)}
+.locked .ico{font-size:34px}
+.locked b{color:var(--ink);font-size:1.15rem;display:block}
+
+.gamehead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.hud{display:flex;gap:8px;flex-wrap:wrap}
+.stage{background:rgba(255,255,255,.1);border-radius:28px;padding:16px;min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;position:relative;overflow:hidden}
+
+.mem{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%;max-width:560px}
+.card{aspect-ratio:1;max-width:100%;border-radius:20px;perspective:600px;background:none;padding:0}
+.card .in{position:relative;display:block;width:100%;height:100%;transition:transform .35s;transform-style:preserve-3d}
+.card.up .in,.card.done .in{transform:rotateY(180deg)}
+.card .f,.card .b{position:absolute;inset:0;border-radius:20px;display:grid;place-items:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.card .b{background:var(--star);box-shadow:inset 0 -6px 0 var(--star-deep);font-size:clamp(28px,6vw,44px);color:var(--card-ink)}
+.card .f{background:var(--card);transform:rotateY(180deg);font-size:clamp(34px,8vw,58px)}
+.card.done .f{background:#d8ffe9}
+
+.simon{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:min(420px,100%)}
+.pad{aspect-ratio:1;border-radius:32px;opacity:.55;transition:opacity .1s,transform .1s;box-shadow:inset 0 -8px 0 rgba(0,0,0,.2)}
+.pad.lit{opacity:1;transform:scale(1.04);box-shadow:0 0 40px currentColor,inset 0 -8px 0 rgba(0,0,0,.2)}
+.pad[data-i="0"]{background:var(--pink);color:var(--pink)}
+.pad[data-i="1"]{background:var(--mint);color:var(--mint)}
+.pad[data-i="2"]{background:var(--sky);color:var(--sky)}
+.pad[data-i="3"]{background:var(--coral);color:var(--coral)}
+.simon.wait .pad{pointer-events:none}
+.msg{font-size:1.5rem;font-weight:800;text-align:center;min-height:2.2em}
+
+.arena{position:relative;width:100%;height:60vh;min-height:320px;touch-action:manipulation}
+.target{position:absolute;width:76px;height:76px;margin:-38px 0 0 -38px;background:none;font-size:60px;line-height:76px;padding:0;animation:pop .25s ease-out}
+.target.gone{animation:vanish .25s forwards;pointer-events:none}
+.plus{position:absolute;font-weight:800;font-size:1.6rem;color:var(--star);pointer-events:none;animation:rise .7s forwards}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+@keyframes vanish{to{transform:scale(1.8);opacity:0}}
+@keyframes rise{to{transform:translateY(-50px);opacity:0}}
+
+.big{background:var(--star);color:var(--card-ink);font-size:1.5rem;font-weight:800;border-radius:999px;padding:12px 34px;box-shadow:0 6px 0 var(--star-deep)}
+.big:active{transform:translateY(3px);box-shadow:0 3px 0 var(--star-deep)}
+.ghost{background:rgba(255,255,255,.16);color:var(--ink);font-size:1.2rem;font-weight:700;border-radius:999px;padding:10px 24px}
+.soft{background:#f1ecff;color:var(--card-ink)}
+
+.overlay{position:fixed;inset:0;background:rgba(20,10,50,.6);display:grid;place-items:center;z-index:20;padding:20px;overflow-y:auto}
+.sheet{background:var(--card);color:var(--card-ink);border-radius:32px;padding:26px;width:min(460px,100%);display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center;animation:pop .3s}
+.sheet h2{font-size:1.8rem}
+.won{font-size:56px;letter-spacing:4px}
+.won span{display:inline-block;animation:pop .4s backwards}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.sheet input{font-family:inherit;font-size:1.4rem;padding:10px 16px;border-radius:16px;border:3px solid #e2dbff;width:100%;text-align:center;color:var(--card-ink);background:#fff;user-select:text;-webkit-user-select:text}
+.sheet input:focus{outline:none;border-color:var(--sky-bot)}
+.pick{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.pick button{width:52px;height:52px;border-radius:50%;font-size:30px;background:#f3efff;border:3px solid transparent}
+.pick button[aria-pressed="true"]{border-color:var(--sky-bot)}
+.pick.colors button{font-size:0}
+.danger{background:none;color:#c0396b;font-weight:700;font-size:1rem;text-decoration:underline}
+.note{font-size:.95rem;color:var(--ink-soft);text-align:center;margin:0}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:1.25rem;letter-spacing:.06em;background:#f3efff;border-radius:14px;padding:10px 14px;direction:ltr;user-select:all;-webkit-user-select:all;word-break:break-all}
+.small{font-size:.95rem;color:#5a4f80;margin:0}
+.section{width:100%;display:flex;flex-direction:column;gap:8px;align-items:center;padding-top:10px;border-top:2px solid #f1ecff}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:480px){.mem{gap:8px}.kid .face{width:88px;height:88px;font-size:50px}}
+</style>
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+<div class="app" id="app"></div>
+<div id="layer"></div>
+
+<script type="module">
+// ================= Firebase settings =================
+const firebaseConfig = {
+  apiKey: "AIzaSyATCyi3chaHiJRdgoSeJJzTnji4UXVTMg8",
+  authDomain: "nujoom-4de2f.firebaseapp.com",
+  projectId: "nujoom-4de2f",
+  storageBucket: "nujoom-4de2f.firebasestorage.app",
+  messagingSenderId: "99461513282",
+  appId: "1:99461513282:web:9c4620e95f947d43372ddb"
+};
+const FB = "https://www.gstatic.com/firebasejs/10.12.2/";
+
+// ================= text =================
+const T = {
+  ar: {
+    app:"نجوم البيت", who:"مين بتلعب اليوم؟", whoSub:"اختاري اسمك وابدئي تجمعين النجوم",
+    add:"إضافة بنت", hi:"أهلاً يا", hiSub:"كل لعبة تعطيك نجوم ⭐ اجمعيها!",
+    games:"الألعاب", soon:"قريباً",
+    mem:"لعبة الذاكرة", memD:"اقلبي البطاقات ولاقي كل حيوان مع توأمه",
+    sim:"تحدي الألوان", simD:"احفظي ترتيب الألوان وكرريه، كل مرة يطول!",
+    tap:"اصطادي النجوم", tapD:"اضغطي على النجوم بسرعة قبل ما تختفي. ٣٠ ثانية!",
+    tasks:"مهامي اليومية", tasksD:"رتبي غرفتك واكسبي نجوم",
+    learn:"تعلّم والعب", learnD:"رياضيات وإنجليزي بنجوم أكثر",
+    moves:"حركات", pairs:"أزواج", level:"المستوى", score:"النقاط",
+    bestMoves:n=>`أفضل نتيجة: ${n} حركة`, bestLevel:n=>`أعلى مستوى: ${n}`, bestScore:n=>`أعلى نقاط: ${n}`, none:"ما لعبتيها لسا",
+    back:"رجوع", start:"ابدئي", again:"مرة ثانية", home:"الألعاب",
+    watch:"ركّزي…", yourTurn:"دورك!", oops:"أوه! خلص الدور",
+    win:"برافو!", got:n=>`كسبتي ${n} نجوم`, newBest:"رقم قياسي جديد! 🎉",
+    edit:"تعديل", name:"الاسم", avatar:"الصورة", color:"اللون", save:"حفظ", cancel:"إلغاء",
+    remove:"حذف هذا الملف", sure:"متأكد؟ اضغط مرة ثانية للحذف",
+    defName:"اسم البنت", lang:"English",
+    syncOn:"متزامن", syncOff:"بدون مزامنة", syncWait:"يتصل…",
+    settings:"إعدادات الأب", close:"إغلاق",
+    famCode:"رمز العائلة", famCodeNote:"احفظ هذا الرمز في مكان آمن. به ترجع النجوم لو تغيّر الجهاز.",
+    copy:"نسخ", copied:"تم النسخ ✓", famLink:"رابط لجهاز ثاني", famLinkNote:"افتح هذا الرابط من جوالك عشان تشوف نفس النجوم.",
+    join:"عندي رمز عائلة", joinBtn:"انضمام", joinBad:"الرمز لازم يكون ٢٠ حرف أو أكثر",
+    syncErr:"المزامنة متوقفة: تأكد من قواعد الأمان وتفعيل Anonymous في Firebase. النجوم محفوظة على هذا الجهاز.",
+    syncNoNet:"ما فيه اتصال. النجوم محفوظة على الجهاز وبتترفع لما يرجع النت."
+  },
+  en: {
+    app:"Home Stars", who:"Who's playing today?", whoSub:"Pick your name and start collecting stars",
+    add:"Add a player", hi:"Hi", hiSub:"Every game gives you stars ⭐ collect them all!",
+    games:"Games", soon:"Coming soon",
+    mem:"Memory Match", memD:"Flip the cards and find each animal's twin",
+    sim:"Color Challenge", simD:"Remember the color order and repeat it. It grows each round!",
+    tap:"Star Catcher", tapD:"Tap the stars fast before they vanish. 30 seconds!",
+    tasks:"My Daily Tasks", tasksD:"Tidy your room and earn stars",
+    learn:"Learn & Play", learnD:"Math and Arabic for even more stars",
+    moves:"Moves", pairs:"Pairs", level:"Level", score:"Score",
+    bestMoves:n=>`Best: ${n} moves`, bestLevel:n=>`Best level: ${n}`, bestScore:n=>`Best score: ${n}`, none:"Not played yet",
+    back:"Back", start:"Start", again:"Play again", home:"Games",
+    watch:"Watch…", yourTurn:"Your turn!", oops:"Oh no! Round over",
+    win:"Great job!", got:n=>`You earned ${n} star${n==1?"":"s"}`, newBest:"New record! 🎉",
+    edit:"Edit", name:"Name", avatar:"Picture", color:"Color", save:"Save", cancel:"Cancel",
+    remove:"Delete this profile", sure:"Sure? Tap again to delete",
+    defName:"Name", lang:"العربية",
+    syncOn:"Synced", syncOff:"Not syncing", syncWait:"Connecting…",
+    settings:"Parent settings", close:"Close",
+    famCode:"Family code", famCodeNote:"Keep this code somewhere safe. It brings the stars back on a new device.",
+    copy:"Copy", copied:"Copied ✓", famLink:"Link for another device", famLinkNote:"Open this link on your phone to see the same stars.",
+    join:"I have a family code", joinBtn:"Join", joinBad:"The code must be at least 20 characters",
+    syncErr:"Sync is off: check the security rules and that Anonymous sign-in is on in Firebase. Stars are saved on this device.",
+    syncNoNet:"No connection. Stars are saved on this device and will upload when you're back online."
+  }
+};
+const AVATARS=["🦄","🐱","🐰","🦋","🐼","🦊","🐬","🌸","🧚","🐢","🦁","🐧"];
+const COLORS=["#ffb3d4","#b8f0dc","#bfe3ff","#ffd9a8","#e2cfff","#fff0a0"];
+const SHADE={"#ffb3d4":"#ff8fbf","#b8f0dc":"#7fdcbc","#bfe3ff":"#8ccaff","#ffd9a8":"#ffbb6b","#e2cfff":"#c5a6ff","#fff0a0":"#f2d75c"};
+
+// ================= local storage =================
+const LS = {
+  get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+function newCode(){
+  const A="abcdefghjkmnpqrstuvwxyz23456789"; const r=new Uint32Array(24);
+  crypto.getRandomValues(r); return Array.from(r,x=>A[x%A.length]).join("");
+}
+const validCode = c => typeof c==="string" && /^[a-z0-9]{20,64}$/.test(c);
+
+let lang = LS.get("nj_lang","ar");
+const t = k => T[lang][k];
+let fam = LS.get("nj_family",null);
+const hashCode = (location.hash.match(/f=([a-z0-9]+)/)||[])[1];
+if(validCode(hashCode)){ fam = hashCode; LS.set("nj_kids",null); history.replaceState(null,"",location.pathname); }
+if(!validCode(fam)) fam = newCode();
+LS.set("nj_family",fam);
+
+const defaults = () => ([
+  {id:"k1",name:"",avatar:"🦄",color:"#ffb3d4",stars:0,best:{}},
+  {id:"k2",name:"",avatar:"🐱",color:"#b8f0dc",stars:0,best:{}}
+]);
+let kids = LS.get("nj_kids",null) || defaults();
+let currentId = LS.get("nj_current", null);
+let view = kids.find(k=>k.id===currentId) ? "hub" : "who";
+let cleanup = null;
+let sync = "wait"; // wait | on | off | nonet
+let F = null;      // firebase handles
+
+const cacheKids = () => LS.set("nj_kids", kids);
+const kidName = k => k.name || t("defName");
+const cur = () => kids.find(k=>k.id===currentId);
+const clean = k => ({name:String(k.name||"").slice(0,20),avatar:k.avatar,color:k.color,stars:Math.max(0,k.stars|0),best:k.best||{}});
+
+// ---- writes (local first, cloud when available) ----
+function cloudSet(k){ if(F) F.setDoc(F.doc(F.db,"families",fam,"kids",k.id), clean(k)).catch(onCloudError); }
+function cloudReward(k,stars,game,value,isBest){
+  if(!F) return;
+  const patch={stars:F.increment(stars)}; if(isBest) patch["best."+game]=value;
+  F.updateDoc(F.doc(F.db,"families",fam,"kids",k.id),patch).catch(()=>cloudSet(k));
+}
+function cloudDelete(id){ if(F) F.deleteDoc(F.doc(F.db,"families",fam,"kids",id)).catch(onCloudError); }
+function onCloudError(e){ console.warn(e); setSync(e&&e.code==="unavailable"?"nonet":"off"); }
+
+// ================= sound =================
+let ac=null;
+function tone(freq,dur=.15,type="sine",vol=.18){
+  try{
+    ac = ac || new (window.AudioContext||window.webkitAudioContext)();
+    if(ac.state==="suspended") ac.resume();
+    const o=ac.createOscillator(), g=ac.createGain();
+    o.type=type;o.frequency.value=freq;g.gain.value=vol;
+    o.connect(g);g.connect(ac.destination);
+    g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+dur);
+    o.start();o.stop(ac.currentTime+dur);
+  }catch(e){}
+}
+const chime=()=>{[660,880,1320].forEach((f,i)=>setTimeout(()=>tone(f,.25,"triangle"),i*110))};
+
+// ================= helpers =================
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const num = n => Number(n).toLocaleString(lang==="ar"?"ar-SA":"en-US");
+function applyLang(){
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang==="ar"?"rtl":"ltr";
+  document.title = t("app");
+}
+function go(v){ if(cleanup){cleanup();cleanup=null} view=v; render(); window.scrollTo(0,0); }
+function setSync(s){ sync=s; const el=$("#syncPill"); if(el){ el.className="pill sync "+(s==="on"?"on":s==="wait"?"":"off"); el.lastChild.textContent=" "+syncLabel(); } }
+const syncLabel = () => sync==="on"?t("syncOn"):sync==="wait"?t("syncWait"):t("syncOff");
+
+const logo = `<svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4l5.6 12.2L43 17.8l-10 9.2 2.7 13.3L24 33.6 12.3 40.3 15 27 5 17.8l13.4-1.6z" fill="#ffd23f" stroke="#f4a300" stroke-width="2" stroke-linejoin="round"/><circle cx="19" cy="23" r="2" fill="#2a1f4f"/><circle cx="29" cy="23" r="2" fill="#2a1f4f"/><path d="M19.5 28q4.5 4 9 0" stroke="#2a1f4f" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`;
+
+function topBar(){
+  const k = cur();
+  return `<div class="bar">
+    <div class="brand">${logo}<span>${t("app")}</span></div>
+    <div class="bar-actions">
+      ${k && view!=="who" ? `<span class="pill starcount">⭐ ${num(k.stars||0)}</span>`:""}
+      ${view==="who" ? `<button class="pill sync ${sync==="on"?"on":sync==="wait"?"":"off"}" id="syncPill"><i></i> ${syncLabel()}</button><button class="pill" id="gear" aria-label="${t("settings")}">⚙️</button>`:""}
+      <button class="pill" id="langBtn">${t("lang")}</button>
+    </div>
+  </div>`;
+}
+
+// ================= views =================
+function render(){
+  applyLang();
+  const app = $("#app");
+  if(view==="hub" && !cur()) view="who";
+  if(view==="who") app.innerHTML = topBar()+whoView();
+  else if(view==="hub") app.innerHTML = topBar()+hubView();
+  else app.innerHTML = topBar()+gameShell();
+  $("#langBtn").onclick = () => { lang = lang==="ar"?"en":"ar"; LS.set("nj_lang",lang); if(view.startsWith("g-")) go("hub"); else render(); };
+  if($("#gear")) $("#gear").onclick = openSettings;
+  if($("#syncPill")) $("#syncPill").onclick = openSettings;
+  if(view==="who") bindWho();
+  if(view==="hub") bindHub();
+  if(view==="g-mem") startMemory();
+  if(view==="g-sim") startSimon();
+  if(view==="g-tap") startTap();
+}
+function refreshStars(){
+  const k=cur(), sc=document.querySelector(".starcount");
+  if(sc&&k) sc.textContent=`⭐ ${num(k.stars||0)}`;
+}
+
+function whoView(){
+  const top = Math.max(0,...kids.map(k=>k.stars||0));
+  const cards = kids.map(k=>`
+    <div class="kid" style="--c:${k.color};--shade:${SHADE[k.color]||"#c9b8f0"}" role="button" tabindex="0" data-id="${esc(k.id)}">
+      ${top>0 && k.stars===top ? `<span class="crown" aria-hidden="true">👑</span>`:""}
+      <button class="edit" data-edit="${esc(k.id)}" aria-label="${t("edit")}">✏️</button>
+      <div class="face" aria-hidden="true">${esc(k.avatar)}</div>
+      <div class="name">${esc(kidName(k))}</div>
+      <div class="stars">⭐ ${num(k.stars||0)}</div>
+    </div>`).join("");
+  const warn = sync==="off" ? `<p class="note">⚠️ ${t("syncErr")}</p>` : sync==="nonet" ? `<p class="note">📡 ${t("syncNoNet")}</p>` : "";
+  return `<div><h1>${t("who")}</h1><p class="sub">${t("whoSub")}</p></div>
+    <div class="kids">${cards}<button class="kid add" id="addKid">＋ ${t("add")}</button></div>${warn}`;
+}
+function bindWho(){
+  document.querySelectorAll(".kid[data-id]").forEach(el=>{
+    const pick = () => { currentId = el.dataset.id; LS.set("nj_current",currentId); tone(784,.12,"triangle"); go("hub"); };
+    el.onclick = e => { if(e.target.closest("[data-edit]")) return; pick(); };
+    el.onkeydown = e => { if(e.key==="Enter"||e.key===" "){e.preventDefault();pick()} };
+  });
+  document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=e=>{e.stopPropagation();openEditor(b.dataset.edit)});
+  $("#addKid").onclick=()=>openEditor(null);
+}
+
+function hubView(){
+  const k = cur(), b = k.best||{};
+  return `<div class="hello">
+      <div class="face" style="--c:${k.color}" aria-hidden="true">${esc(k.avatar)}</div>
+      <div><h1>${t("hi")} ${esc(kidName(k))}</h1><p class="sub">${t("hiSub")}</p></div>
+    </div>
+    <div class="row" style="justify-content:flex-start"><button class="ghost" id="switch">↩︎ ${t("who")}</button></div>
+    <h2>${t("games")}</h2>
+    <div class="games">
+      <button class="game g-mem" data-g="g-mem"><span class="ico">🃏</span><span class="t">${t("mem")}</span><span class="d">${t("memD")}</span><span class="best">${b.mem?t("bestMoves")(num(b.mem)):t("none")}</span></button>
+      <button class="game g-sim" data-g="g-sim"><span class="ico">🎨</span><span class="t">${t("sim")}</span><span class="d">${t("simD")}</span><span class="best">${b.sim?t("bestLevel")(num(b.sim)):t("none")}</span></button>
+      <button class="game g-tap" data-g="g-tap"><span class="ico">🌟</span><span class="t">${t("tap")}</span><span class="d">${t("tapD")}</span><span class="best">${b.tap?t("bestScore")(num(b.tap)):t("none")}</span></button>
+    </div>
+    <h2>${t("soon")}</h2>
+    <div class="soon">
+      <div class="locked"><span class="ico">📋</span><span><b>${t("tasks")}</b>${t("tasksD")}</span></div>
+      <div class="locked"><span class="ico">📚</span><span><b>${t("learn")}</b>${t("learnD")}</span></div>
+    </div>`;
+}
+function bindHub(){
+  document.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{tone(660,.1,"triangle");go(b.dataset.g)});
+  $("#switch").onclick=()=>go("who");
+}
+
+function gameShell(){
+  const name = {"g-mem":t("mem"),"g-sim":t("sim"),"g-tap":t("tap")}[view];
+  return `<div class="gamehead"><button class="ghost" id="back">${lang==="ar"?"→":"←"} ${t("back")}</button><h2>${name}</h2><div class="hud" id="hud"></div></div>
+    <div class="stage" id="stage"></div>`;
+}
+const bindBack = () => { $("#back").onclick=()=>go("hub"); };
+
+// ================= reward =================
+function reward(game, value, better, stars, line){
+  const k = cur(); if(!k) return;
+  k.best = k.best||{};
+  const prev = k.best[game];
+  const isBest = prev==null || better(value,prev);
+  if(isBest) k.best[game]=value;
+  k.stars = (k.stars||0)+stars;
+  cacheKids(); cloudReward(k,stars,game,value,isBest); refreshStars();
+  chime();
+  const starsHtml = Array.from({length:stars},(_,i)=>`<span style="animation-delay:${i*.12}s">⭐</span>`).join("");
+  $("#layer").innerHTML = `<div class="overlay"><div class="sheet" role="dialog" aria-modal="true">
+    <h2>${t("win")}</h2>
+    <div class="won" aria-hidden="true">${starsHtml}</div>
+    <div style="font-size:1.4rem;font-weight:800">${t("got")(num(stars))}</div>
+    <div style="font-size:1.1rem">${line}</div>
+    ${isBest && prev!=null ? `<div style="font-size:1.2rem;font-weight:800;color:#c05a00">${t("newBest")}</div>`:""}
+    <div class="row"><button class="big" id="again">${t("again")}</button><button class="ghost soft" id="toHub">${t("home")}</button></div>
+  </div></div>`;
+  $("#again").onclick=()=>{ $("#layer").innerHTML=""; go(view); };
+  $("#toHub").onclick=()=>{ $("#layer").innerHTML=""; go("hub"); };
+}
+
+// ================= game 1: memory =================
+function startMemory(){
+  bindBack();
+  const pool=["🐶","🐱","🦁","🐸","🐵","🐙","🦒","🐳","🦜","🐨"].sort(()=>Math.random()-.5).slice(0,6);
+  const deck=[...pool,...pool].sort(()=>Math.random()-.5);
+  let open=[],moves=0,found=0,lock=false;
+  const hud=()=>$("#hud").innerHTML=`<span class="pill">${t("moves")}: ${num(moves)}</span><span class="pill">${t("pairs")}: ${num(found)}/${num(6)}</span>`;
+  hud();
+  $("#stage").innerHTML=`<div class="mem">${deck.map((e,i)=>`<button class="card" data-i="${i}" aria-label="?"><span class="in"><span class="b">★</span><span class="f">${e}</span></span></button>`).join("")}</div>`;
+  document.querySelectorAll(".card").forEach(c=>c.onclick=()=>{
+    if(lock||c.classList.contains("up")||c.classList.contains("done")) return;
+    c.classList.add("up"); tone(520,.08,"triangle"); open.push(c);
+    if(open.length<2) return;
+    moves++; hud();
+    const [a,b]=open;
+    if(deck[a.dataset.i]===deck[b.dataset.i]){
+      setTimeout(()=>{a.classList.add("done");b.classList.add("done");tone(988,.18,"triangle");found++;hud();open=[];
+        if(found===6){ const s=moves<=9?3:moves<=13?2:1; setTimeout(()=>reward("mem",moves,(v,p)=>v<p,s,`${t("moves")}: ${num(moves)}`),500); }
+      },250);
+    } else {
+      lock=true;
+      setTimeout(()=>{a.classList.remove("up");b.classList.remove("up");open=[];lock=false},800);
+    }
+  });
+}
+
+// ================= game 2: color challenge =================
+function startSimon(){
+  bindBack();
+  const notes=[523,659,784,988];
+  let seq=[],pos=0,timers=[],alive=true;
+  cleanup=()=>{alive=false;timers.forEach(clearTimeout)};
+  const hud=()=>$("#hud").innerHTML=`<span class="pill">${t("level")}: ${num(Math.max(seq.length,1))}</span>`;
+  $("#stage").innerHTML=`<div class="msg" id="msg">${t("simD")}</div>
+    <div class="simon wait" id="simon">${[0,1,2,3].map(i=>`<button class="pad" data-i="${i}" aria-label="${i+1}"></button>`).join("")}</div>
+    <button class="big" id="go">${t("start")}</button>`;
+  hud();
+  const pads=[...document.querySelectorAll(".pad")], board=$("#simon"), msg=$("#msg");
+  const flash=(i,d=380)=>{pads[i].classList.add("lit");tone(notes[i],d/1000,"sine",.22);timers.push(setTimeout(()=>pads[i].classList.remove("lit"),d))};
+  function next(){
+    seq.push(Math.floor(Math.random()*4)); pos=0; hud();
+    board.classList.add("wait"); msg.textContent=t("watch");
+    const gap=Math.max(320,650-seq.length*25);
+    seq.forEach((p,i)=>timers.push(setTimeout(()=>alive&&flash(p,gap*.65),600+i*gap)));
+    timers.push(setTimeout(()=>{if(!alive)return;board.classList.remove("wait");msg.textContent=t("yourTurn")},600+seq.length*gap));
+  }
+  pads.forEach(p=>p.onclick=()=>{
+    const i=+p.dataset.i; flash(i,220);
+    if(i!==seq[pos]){
+      board.classList.add("wait"); msg.textContent=t("oops"); tone(180,.4,"sawtooth",.12);
+      const lvl=seq.length-1;
+      if(lvl<1){ timers.push(setTimeout(()=>alive&&go("g-sim"),1200)); return; }
+      const s=Math.min(5,Math.max(1,Math.ceil(lvl/2)));
+      timers.push(setTimeout(()=>alive&&reward("sim",lvl,(v,p)=>v>p,s,`${t("level")}: ${num(lvl)}`),900));
+      return;
+    }
+    pos++;
+    if(pos===seq.length){ board.classList.add("wait"); timers.push(setTimeout(()=>alive&&next(),700)); }
+  });
+  $("#go").onclick=e=>{e.currentTarget.hidden=true;next()};
+}
+
+// ================= game 3: star catcher =================
+function startTap(){
+  bindBack();
+  let score=0,left=30,timers=[],tick=null,alive=true;
+  cleanup=()=>{alive=false;timers.forEach(clearTimeout);clearInterval(tick)};
+  const hud=()=>$("#hud").innerHTML=`<span class="pill">${t("score")}: ${num(score)}</span><span class="pill">⏱ ${num(left)}</span>`;
+  hud();
+  $("#stage").innerHTML=`<div class="arena" id="arena"><div style="position:absolute;inset:0;display:grid;place-items:center"><button class="big" id="go">${t("start")}</button></div></div>`;
+  const arena=$("#arena");
+  function spawn(){
+    if(!alive||left<=0) return;
+    const comet=Math.random()<.12;
+    const b=document.createElement("button");
+    b.className="target"; b.textContent=comet?"☄️":"⭐"; b.setAttribute("aria-label",comet?"+3":"+1");
+    b.style.left=(10+Math.random()*80)+"%"; b.style.top=(12+Math.random()*76)+"%";
+    const life=comet?900:Math.max(800,1500-(30-left)*20);
+    b.onpointerdown=e=>{
+      e.preventDefault(); if(b.classList.contains("gone")) return;
+      const add=comet?3:1; score+=add; hud(); tone(comet?1320:880+Math.random()*200,.1,"triangle");
+      b.classList.add("gone");
+      const p=document.createElement("span"); p.className="plus"; p.textContent="+"+add; p.style.left=b.style.left; p.style.top=b.style.top; arena.appendChild(p);
+      timers.push(setTimeout(()=>{b.remove();p.remove()},700));
+    };
+    arena.appendChild(b);
+    timers.push(setTimeout(()=>{if(!b.classList.contains("gone")){b.classList.add("gone");timers.push(setTimeout(()=>b.remove(),300))}},life));
+    timers.push(setTimeout(spawn,Math.max(350,750-(30-left)*12)));
+  }
+  $("#go").onclick=()=>{
+    arena.innerHTML=""; spawn(); spawn();
+    tick=setInterval(()=>{left--;hud();if(left<=0){clearInterval(tick);
+      timers.push(setTimeout(()=>{ if(!alive) return; arena.innerHTML="";
+        const s=Math.min(5,Math.max(1,Math.floor(score/10)));
+        reward("tap",score,(v,p)=>v>p,s,`${t("score")}: ${num(score)}`);
+      },400));
+    }},1000);
+  };
+}
+
+// ================= profile editor =================
+function openEditor(id){
+  const existing = kids.find(k=>k.id===id);
+  const k = existing ? {...existing} : {id:"k"+Date.now().toString(36),name:"",avatar:AVATARS[kids.length%AVATARS.length],color:COLORS[kids.length%COLORS.length],stars:0,best:{}};
+  let armed=false;
+  const draw=()=>{
+    $("#layer").innerHTML=`<div class="overlay"><form class="sheet" id="ed" role="dialog" aria-modal="true">
+      <div style="width:90px;height:90px;border-radius:50%;display:grid;place-items:center;font-size:54px;background:${k.color}" aria-hidden="true">${esc(k.avatar)}</div>
+      <label for="kname" style="font-weight:700">${t("name")}</label>
+      <input id="kname" value="${esc(k.name)}" maxlength="20" autocomplete="off" placeholder="${t("defName")}">
+      <div style="font-weight:700">${t("avatar")}</div>
+      <div class="pick">${AVATARS.map(a=>`<button type="button" data-a="${a}" aria-pressed="${a===k.avatar}">${a}</button>`).join("")}</div>
+      <div style="font-weight:700">${t("color")}</div>
+      <div class="pick colors">${COLORS.map(c=>`<button type="button" data-c="${c}" style="background:${c}" aria-pressed="${c===k.color}" aria-label="${c}">.</button>`).join("")}</div>
+      <div class="row"><button class="big" type="submit">${t("save")}</button><button class="ghost soft" type="button" id="cx">${t("cancel")}</button></div>
+      ${existing?`<button type="button" class="danger" id="del">${armed?t("sure"):t("remove")}</button>`:""}
+    </form></div>`;
+    $("#kname").oninput=e=>k.name=e.target.value;
+    document.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{k.avatar=b.dataset.a;draw()});
+    document.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{k.color=b.dataset.c;draw()});
+    $("#cx").onclick=()=>$("#layer").innerHTML="";
+    $("#ed").onsubmit=e=>{e.preventDefault();k.name=k.name.trim();
+      const i=kids.findIndex(x=>x.id===k.id); if(i>=0) kids[i]=k; else kids.push(k);
+      cacheKids(); cloudSet(k); $("#layer").innerHTML=""; render();};
+    const d=$("#del"); if(d) d.onclick=()=>{ if(!armed){armed=true;draw();return}
+      kids=kids.filter(x=>x.id!==k.id); cacheKids(); cloudDelete(k.id);
+      if(currentId===k.id) currentId=null; $("#layer").innerHTML=""; render(); };
+  };
+  draw();
+}
+
+// ================= parent settings =================
+function openSettings(){
+  const link = location.origin + location.pathname + "#f=" + fam;
+  $("#layer").innerHTML=`<div class="overlay"><div class="sheet" role="dialog" aria-modal="true">
+    <h2>⚙️ ${t("settings")}</h2>
+    <p class="small">${sync==="on"?"🟢 "+t("syncOn"):sync==="nonet"?"📡 "+t("syncNoNet"):sync==="off"?"⚠️ "+t("syncErr"):"⏳ "+t("syncWait")}</p>
+    <div class="section"><b>${t("famCode")}</b><div class="code" id="fc">${fam}</div><p class="small">${t("famCodeNote")}</p>
+      <button class="ghost soft" data-copy="${fam}">${t("copy")}</button></div>
+    <div class="section"><b>${t("famLink")}</b><div class="code" style="font-size:.9rem">${esc(link)}</div><p class="small">${t("famLinkNote")}</p>
+      <button class="ghost soft" data-copy="${esc(link)}">${t("copy")}</button></div>
+    <form class="section" id="joinForm"><b>${t("join")}</b>
+      <input id="joinCode" autocomplete="off" autocapitalize="off" spellcheck="false" dir="ltr" placeholder="abcd…">
+      <p class="small" id="joinMsg"></p>
+      <button class="ghost soft" type="submit">${t("joinBtn")}</button></form>
+    <button class="big" id="closeS">${t("close")}</button>
+  </div></div>`;
+  document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=async()=>{
+    try{ await navigator.clipboard.writeText(b.dataset.copy); b.textContent=t("copied"); }
+    catch(e){ const r=document.createRange(); r.selectNodeContents(b.previousElementSibling.previousElementSibling); const s=getSelection(); s.removeAllRanges(); s.addRange(r); }
+  });
+  $("#joinForm").onsubmit=e=>{
+    e.preventDefault();
+    const c=$("#joinCode").value.trim().toLowerCase().replace(/[^a-z0-9]/g,"");
+    if(!validCode(c)){ $("#joinMsg").textContent=t("joinBad"); return; }
+    fam=c; LS.set("nj_family",fam); kids=[]; cacheKids(); currentId=null;
+    $("#layer").innerHTML=""; view="who"; render(); listen();
+  };
+  $("#closeS").onclick=()=>{$("#layer").innerHTML=""; render();};
+}
+
+// ================= cloud sync =================
+let unsub=null, seeded=false;
+function listen(){
+  if(!F) return;
+  if(unsub) unsub();
+  seeded=false; setSync("wait");
+  const col = F.collection(F.db,"families",fam,"kids");
+  unsub = F.onSnapshot(col,{includeMetadataChanges:true}, snap=>{
+    const fromServer = !snap.metadata.fromCache;
+    if(fromServer) setSync("on");
+    if(snap.empty){
+      if(fromServer && !seeded){ seeded=true; if(!kids.length) kids=defaults(); kids.forEach(cloudSet); cacheKids(); }
+      return;
+    }
+    kids = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.id.localeCompare(b.id));
+    cacheKids();
+    if(view.startsWith("g-")) refreshStars();
+    else if(!$("#layer").innerHTML) render();
+  }, err=>{ onCloudError(err); unsub=null; render(); });
+}
+async function startCloud(){
+  try{
+    const [{initializeApp},{getAuth,signInAnonymously,onAuthStateChanged},fs] = await Promise.all([
+      import(FB+"firebase-app.js"), import(FB+"firebase-auth.js"), import(FB+"firebase-firestore.js")
+    ]);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    let db;
+    try{ db = fs.initializeFirestore(app,{localCache:fs.persistentLocalCache()}); }
+    catch(e){ db = fs.getFirestore(app); }
+    onAuthStateChanged(auth, user=>{
+      if(!user){ signInAnonymously(auth).catch(e=>{ console.warn(e); setSync(navigator.onLine?"off":"nonet"); if(view==="who") render(); }); return; }
+      if(F) return;
+      F = {db, doc:fs.doc, collection:fs.collection, setDoc:fs.setDoc, updateDoc:fs.updateDoc, deleteDoc:fs.deleteDoc, onSnapshot:fs.onSnapshot, increment:fs.increment};
+      listen();
+    });
+  }catch(e){
+    console.warn("Firebase not loaded", e);
+    setSync("nonet"); if(view==="who") render();
+  }
+}
+
+// ================= night sky =================
+function sky(){
+  const c=$("#sky"),x=c.getContext("2d"),dpr=Math.min(2,window.devicePixelRatio||1);
+  let pts=[];
+  const size=()=>{c.width=innerWidth*dpr;c.height=innerHeight*dpr;c.style.width=innerWidth+"px";c.style.height=innerHeight+"px";
+    pts=Array.from({length:70},()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:(Math.random()*1.6+.4)*dpr,p:Math.random()*6}))};
+  size(); addEventListener("resize",size);
+  const still=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const draw=tm=>{x.clearRect(0,0,c.width,c.height);
+    pts.forEach(s=>{x.globalAlpha=still?.7:.35+.45*Math.abs(Math.sin(tm/1400+s.p));x.fillStyle="#fffbe6";x.beginPath();x.arc(s.x,s.y,s.r,0,7);x.fill()});
+    if(!still) requestAnimationFrame(draw)};
+  requestAnimationFrame(draw);
+}
+
+// ================= boot =================
+sky(); render(); startCloud();
+if("serviceWorker" in navigator && location.protocol==="https:") navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>
