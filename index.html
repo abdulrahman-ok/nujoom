@@ -306,7 +306,7 @@ function topBar(){
     ${view==="who" ? "" : `<div class="brand">${logo}<span>${t("app")}</span></div>`}
     <div class="bar-actions">
       ${k && view!=="who" ? `<span class="pill starcount">⭐ ${num(k.stars||0)}</span>`:""}
-      ${view==="who" ? `<button class="pill sync ${sync==="on"?"on":sync==="wait"?"":"off"}" id="syncPill"><i></i> ${syncLabel()}</button><button class="pill" id="gear" aria-label="${t("settings")}">⚙️</button>`:""}
+      ${view==="who" ? `<span class="pill sync ${sync==="on"?"on":sync==="wait"?"":"off"}" id="syncPill"><i></i> ${syncLabel()}</span>`:""}
       <button class="pill" id="langBtn">${t("lang")}</button>
     </div>
   </div>`;
@@ -321,8 +321,12 @@ function render(){
   else if(view==="hub") app.innerHTML = topBar()+hubView();
   else app.innerHTML = topBar()+gameShell();
   $("#langBtn").onclick = () => { lang = lang==="ar"?"en":"ar"; LS.set("nj_lang",lang); if(view.startsWith("g-")) go("hub"); else render(); };
-  if($("#gear")) $("#gear").onclick = openSettings;
-  if($("#syncPill")) $("#syncPill").onclick = openSettings;
+  // Parent settings are hidden: press and hold the big title for 2 seconds.
+  const ht = $(".hero-title");
+  if(ht){ let lp=null; const stop=()=>clearTimeout(lp);
+    ht.onpointerdown=()=>{ stop(); lp=setTimeout(()=>{ tone(440,.15,"triangle"); openSettings(); },2000); };
+    ht.onpointerup=stop; ht.onpointerleave=stop; ht.onpointercancel=stop;
+    ht.oncontextmenu=e=>e.preventDefault(); }
   if(view==="who") bindWho();
   if(view==="hub") bindHub();
   if(view==="g-mem") startMemory();
