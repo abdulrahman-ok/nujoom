@@ -139,6 +139,14 @@ h2{font-size:1.4rem;font-weight:800}
 .target{position:absolute;width:76px;height:76px;margin:-38px 0 0 -38px;background:none;font-size:60px;line-height:76px;padding:0;animation:pop .25s ease-out}
 .target.gone{animation:vanish .25s forwards;pointer-events:none}
 .plus{position:absolute;font-weight:800;font-size:1.6rem;color:var(--star);pointer-events:none;animation:rise .7s forwards}
+.plus.minus{color:#ff5d6c;font-size:2rem}
+.target.bomb{filter:drop-shadow(0 0 6px rgba(255,80,80,.7))}
+.target.hit{animation:none;transform:scale(1.6);opacity:1}
+.arena.shake{animation:shake .4s}
+.arena-msg{position:absolute;inset:0;display:grid;place-items:center;font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800;text-align:center;padding:16px;text-shadow:0 3px 0 rgba(0,0,0,.3);animation:pop .3s}
+.tapmodes .mode{padding:16px 12px}
+.tm-t{font-size:1.35rem;font-weight:800}
+.tm-d{font-size:.95rem;opacity:.75;line-height:1.35}
 @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
 @keyframes vanish{to{transform:scale(1.8);opacity:0}}
 @keyframes rise{to{transform:translateY(-50px);opacity:0}}
@@ -220,7 +228,10 @@ const T = {
     games:"الألعاب", soon:"قريباً",
     mem:"لعبة الذاكرة", memD:"اقلبي البطاقات ولاقي كل حيوان مع توأمه",
     sim:"تحدي الألوان", simD:"احفظي ترتيب الألوان وكرريه، كل مرة يطول!",
-    tap:"اصطادي النجوم", tapD:"اضغطي على النجوم بسرعة قبل ما تختفي. ٣٠ ثانية!",
+    tap:"اصطادي النجوم", tapD:"اصطادي النجوم بسرعة، وانتبهي من القنابل 💣!",
+    tapPick:"كيف تبين تلعبين؟", tapTimed:"دقيقة وحدة", tapTimedD:"اجمعي أكثر نقاط في دقيقة. القنبلة تنقص ٣ نقاط.",
+    tapSurv:"بدون غلطة", tapSurvD:"ما فيه وقت، بس إذا لمستي قنبلة تخسرين!", boom:"بووم! لمستي قنبلة 💣", timeUp:"خلص الوقت!",
+    duration:"المدة", bestTapMode:(n,m)=>`أعلى نقاط (${m}): ${n}`,
     tasks:"مهامي اليومية", tasksD:"رتبي غرفتك واكسبي نجوم",
     learn:"تعلّم والعب", learnD:"رياضيات وإنجليزي بنجوم أكثر",
     moves:"حركات", pairs:"أزواج", level:"المستوى", score:"النقاط",
@@ -265,7 +276,10 @@ const T = {
     games:"Games", soon:"Coming soon",
     mem:"Memory Match", memD:"Flip the cards and find each animal's twin",
     sim:"Color Challenge", simD:"Remember the color order and repeat it. It grows each round!",
-    tap:"Star Catcher", tapD:"Tap the stars fast before they vanish. 30 seconds!",
+    tap:"Star Catcher", tapD:"Catch the stars fast and watch out for bombs 💣!",
+    tapPick:"How do you want to play?", tapTimed:"One minute", tapTimedD:"Get the most points in one minute. A bomb takes away 3 points.",
+    tapSurv:"No mistakes", tapSurvD:"No time limit, but touch a bomb and you lose!", boom:"Boom! You touched a bomb 💣", timeUp:"Time's up!",
+    duration:"Time", bestTapMode:(n,m)=>`Best score (${m}): ${n}`,
     tasks:"My Daily Tasks", tasksD:"Tidy your room and earn stars",
     learn:"Learn & Play", learnD:"Math and Arabic for even more stars",
     moves:"Moves", pairs:"Pairs", level:"Level", score:"Score",
@@ -523,7 +537,7 @@ function hubView(){
     <div class="games">
       <button class="game g-mem" data-g="g-mem"><span class="ico">🃏</span><span class="t">${t("mem")}</span><span class="d">${t("memD")}</span><span class="best">${(()=>{ const n=memSize(), v=memBest(b,n); return v?t("bestMemSize")(num(v),num(n)):t("none"); })()}</span></button>
       <button class="game g-sim" data-g="g-sim"><span class="ico">🎨</span><span class="t">${t("sim")}</span><span class="d">${t("simD")}</span><span class="best">${(()=>{ const m=simMode(), v=simBest(b,m.key); return v?t("bestSimMode")(num(v),simLabel(m)):t("none"); })()}</span></button>
-      <button class="game g-tap" data-g="g-tap"><span class="ico">🌟</span><span class="t">${t("tap")}</span><span class="d">${t("tapD")}</span><span class="best">${b.tap?t("bestScore")(num(b.tap)):t("none")}</span></button>
+      <button class="game g-tap" data-g="g-tap"><span class="ico">🌟</span><span class="t">${t("tap")}</span><span class="d">${t("tapD")}</span><span class="best">${(()=>{ const m=tapMode(), v=tapBest(b,m); return v?t("bestTapMode")(num(v),t(m==="s"?"tapSurv":"tapTimed")):t("none"); })()}</span></button>
     </div>
     <h2>${t("soon")}</h2>
     <div class="soon">
@@ -547,7 +561,7 @@ const bindBack = () => { $("#back").onclick=()=>go("hub"); };
 function reward(game, value, better, stars, line){
   const k = cur(); if(!k) return;
   k.best = k.best||{};
-  const prev = game.startsWith("mem") ? memBest(k.best, +game.slice(3)) : game.startsWith("sim") ? simBest(k.best, game) : k.best[game];
+  const prev = game.startsWith("mem") ? memBest(k.best, +game.slice(3)) : game.startsWith("sim") ? simBest(k.best, game) : game==="tap60" ? tapBest(k.best,"t") : k.best[game];
   const isBest = prev==null || better(value,prev);
   if(isBest) k.best[game]=value;
   k.stars = (k.stars||0)+stars;
@@ -564,7 +578,7 @@ function reward(game, value, better, stars, line){
     <div class="row"><button class="big" id="again">${t("again")}</button><button class="ghost soft" id="toHub">${t("home")}</button></div>
   </div></div>`;
   $("#again").onclick=()=>{ $("#layer").innerHTML=""; go(view); };
-  $("#toHub").onclick=()=>{ memAgain=false; simAgain=false; $("#layer").innerHTML=""; go("hub"); };
+  $("#toHub").onclick=()=>{ memAgain=false; simAgain=false; tapAgain=false; $("#layer").innerHTML=""; go("hub"); };
 }
 
 // ================= game 1: memory =================
@@ -690,41 +704,73 @@ function playSimon(m){
 }
 
 // ================= game 3: star catcher =================
+const tapMode=()=>LS.get("nj_tapmode","t")==="s"?"s":"t";
+// Best score per mode. The old 30-second record (before modes existed) counts toward the timed mode.
+const tapBest=(b,m)=>m==="s" ? b.tapS : (b.tap60 || b.tap);
+const mmss=sec=>{ const m=Math.floor(sec/60), x=sec%60; return num(m)+":"+(x<10?num(0):"")+num(x); };
+let tapAgain=false;
+
 function startTap(){
   bindBack();
-  let score=0,left=30,timers=[],tick=null,alive=true;
+  if(tapAgain){ tapAgain=false; playTap(tapMode()); return; }
+  $("#hud").innerHTML="";
+  const b=(cur()||{}).best||{}, chosen=tapMode();
+  $("#stage").innerHTML=`<div class="msg">${t("tapPick")}</div>
+    <div class="modes tapmodes">${[["t","⏱️","tapTimed","tapTimedD"],["s","💣","tapSurv","tapSurvD"]].map(([m,ico,ti,de])=>`
+      <button class="size mode${m===chosen?" chosen":""}" data-m="${m}">
+        <span class="sz-n">${ico}</span><span class="tm-t">${t(ti)}</span><span class="tm-d">${t(de)}</span>
+        ${tapBest(b,m)?`<span class="sz-b">🏆 ${num(tapBest(b,m))}</span>`:""}</button>`).join("")}</div>`;
+  document.querySelectorAll(".mode").forEach(btn=>btn.onclick=()=>{ LS.set("nj_tapmode",btn.dataset.m); tone(660,.1,"triangle"); playTap(btn.dataset.m); });
+}
+
+function playTap(mode){
+  const timed = mode==="t", LIMIT=60;
+  let score=0, sec=0, timers=[], tick=null, alive=true, over=false;
   cleanup=()=>{alive=false;timers.forEach(clearTimeout);clearInterval(tick)};
-  const hud=()=>$("#hud").innerHTML=`<span class="pill">${t("score")}: ${num(score)}</span><span class="pill">⏱ ${num(left)}</span>`;
+  const hud=()=>$("#hud").innerHTML=`<span class="pill">${t("score")}: ${num(score)}</span><span class="pill">⏱ ${timed?num(LIMIT-sec):mmss(sec)}</span>`;
   hud();
-  $("#stage").innerHTML=`<div class="arena" id="arena"><div style="position:absolute;inset:0;display:grid;place-items:center"><button class="big" id="go">${t("start")}</button></div></div>`;
+  $("#stage").innerHTML=`<div class="arena" id="arena"></div>`;
   const arena=$("#arena");
+  const floater=(b,text,cls)=>{ const p=document.createElement("span"); p.className="plus"+(cls?" "+cls:""); p.textContent=text; p.style.left=b.style.left; p.style.top=b.style.top; arena.appendChild(p); timers.push(setTimeout(()=>p.remove(),700)); };
+  // It gets harder over time: things appear faster, vanish sooner, and there are more bombs.
+  const pace=()=> timed
+    ? {every:Math.max(300,750-sec*8),  life:Math.max(700,1500-sec*12), bomb:.15+Math.min(.12,sec*.002)}
+    : {every:Math.max(280,800-sec*6),  life:Math.max(650,1600-sec*10), bomb:.15+Math.min(.2,sec*.004)};
+  function end(why){
+    if(over) return; over=true; clearInterval(tick); timers.forEach(clearTimeout); timers=[];
+    document.querySelectorAll(".target").forEach(x=>x.classList.add("gone"));
+    const msg=document.createElement("div"); msg.className="arena-msg"; msg.textContent=why; arena.appendChild(msg);
+    const s = timed ? Math.min(5,Math.max(1,Math.floor(score/15))) : Math.min(5,Math.max(1,Math.floor(score/10)));
+    const line = timed ? `${t("tapTimed")} · ${t("score")}: ${num(score)}` : `${t("tapSurv")} · ${t("score")}: ${num(score)} · ${t("duration")}: ${mmss(sec)}`;
+    setTimeout(()=>{ if(!alive) return; tapAgain=true; reward(timed?"tap60":"tapS",score,(v,p)=>v>p,s,line); }, 1100);
+  }
   function spawn(){
-    if(!alive||left<=0) return;
-    const comet=Math.random()<.12;
+    if(!alive||over) return;
+    const pc=pace(), r=Math.random();
+    const kind = r<pc.bomb ? "bomb" : r<pc.bomb+.1 ? "comet" : "star";
     const b=document.createElement("button");
-    b.className="target"; b.textContent=comet?"☄️":"⭐"; b.setAttribute("aria-label",comet?"+3":"+1");
+    b.className="target"+(kind==="bomb"?" bomb":"");
+    b.textContent = kind==="bomb"?"💣":kind==="comet"?"☄️":"⭐";
+    b.setAttribute("aria-label", kind==="bomb"?"💣":kind==="comet"?"+3":"+1");
     b.style.left=(10+Math.random()*80)+"%"; b.style.top=(12+Math.random()*76)+"%";
-    const life=comet?900:Math.max(800,1500-(30-left)*20);
     b.onpointerdown=e=>{
-      e.preventDefault(); if(b.classList.contains("gone")) return;
-      const add=comet?3:1; score+=add; hud(); tone(comet?1320:880+Math.random()*200,.1,"triangle");
+      e.preventDefault(); if(over||b.classList.contains("gone")) return;
       b.classList.add("gone");
-      const p=document.createElement("span"); p.className="plus"; p.textContent="+"+add; p.style.left=b.style.left; p.style.top=b.style.top; arena.appendChild(p);
-      timers.push(setTimeout(()=>{b.remove();p.remove()},700));
+      if(kind==="bomb"){
+        tone(140,.35,"sawtooth",.16); arena.classList.remove("shake"); void arena.offsetWidth; arena.classList.add("shake");
+        if(!timed){ b.classList.add("hit"); end(t("boom")); return; }
+        score=Math.max(0,score-3); floater(b,"−3","minus");
+      } else {
+        const add=kind==="comet"?3:1; score+=add; tone(kind==="comet"?1320:880+Math.random()*200,.1,"triangle"); floater(b,"+"+add);
+      }
+      hud(); timers.push(setTimeout(()=>b.remove(),400));
     };
     arena.appendChild(b);
-    timers.push(setTimeout(()=>{if(!b.classList.contains("gone")){b.classList.add("gone");timers.push(setTimeout(()=>b.remove(),300))}},life));
-    timers.push(setTimeout(spawn,Math.max(350,750-(30-left)*12)));
+    timers.push(setTimeout(()=>{ if(!b.classList.contains("gone")){ b.classList.add("gone"); timers.push(setTimeout(()=>b.remove(),300)); } }, kind==="comet"?Math.min(900,pc.life):pc.life));
+    timers.push(setTimeout(spawn,pc.every));
   }
-  $("#go").onclick=()=>{
-    arena.innerHTML=""; spawn(); spawn();
-    tick=setInterval(()=>{left--;hud();if(left<=0){clearInterval(tick);
-      timers.push(setTimeout(()=>{ if(!alive) return; arena.innerHTML="";
-        const s=Math.min(5,Math.max(1,Math.floor(score/10)));
-        reward("tap",score,(v,p)=>v>p,s,`${t("score")}: ${num(score)}`);
-      },400));
-    }},1000);
-  };
+  spawn(); spawn();
+  tick=setInterval(()=>{ sec++; hud(); if(timed && sec>=LIMIT) end(t("timeUp")); },1000);
 }
 
 // ================= profile editor =================
