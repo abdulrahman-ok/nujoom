@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>نجوم البيت</title>
+<title>النجمات</title>
 <meta name="theme-color" content="#2a1f6b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="نجوم البيت">
+<meta name="apple-mobile-web-app-title" content="النجمات">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" href="icon-512.png">
@@ -160,7 +160,7 @@ const FB = "https://www.gstatic.com/firebasejs/10.12.2/";
 // ================= text =================
 const T = {
   ar: {
-    app:"نجوم البيت", who:"مين بتلعب اليوم؟", whoSub:"اختاري اسمك وابدئي تجمعين النجوم",
+    app:"النجمات", who:"مين بتلعب اليوم؟", whoSub:"اختاري اسمك وابدئي تجمعين النجوم",
     add:"إضافة بنت", hi:"أهلاً يا", hiSub:"كل لعبة تعطيك نجوم ⭐ اجمعيها!",
     games:"الألعاب", soon:"قريباً",
     mem:"لعبة الذاكرة", memD:"اقلبي البطاقات ولاقي كل حيوان مع توأمه",
@@ -185,7 +185,7 @@ const T = {
     syncNoNet:"ما فيه اتصال. النجوم محفوظة على الجهاز وبتترفع لما يرجع النت."
   },
   en: {
-    app:"Home Stars", who:"Who's playing today?", whoSub:"Pick your name and start collecting stars",
+    app:"Najmat", who:"Who's playing today?", whoSub:"Pick your name and start collecting stars",
     add:"Add a player", hi:"Hi", hiSub:"Every game gives you stars ⭐ collect them all!",
     games:"Games", soon:"Coming soon",
     mem:"Memory Match", memD:"Flip the cards and find each animal's twin",
@@ -234,8 +234,9 @@ if(!validCode(fam)) fam = newCode();
 LS.set("nj_family",fam);
 
 const defaults = () => ([
-  {id:"k1",name:"",avatar:"🦄",color:"#ffb3d4",stars:0,best:{}},
-  {id:"k2",name:"",avatar:"🐱",color:"#b8f0dc",stars:0,best:{}}
+  {id:"k1",name:"عزيزة",avatar:"🦄",color:"#ffb3d4",stars:0,best:{}},
+  {id:"k2",name:"ديمة",avatar:"🐱",color:"#b8f0dc",stars:0,best:{}},
+  {id:"k3",name:"سلمى",avatar:"🦋",color:"#bfe3ff",stars:0,best:{}}
 ]);
 let kids = LS.get("nj_kids",null) || defaults();
 let currentId = LS.get("nj_current", null);
