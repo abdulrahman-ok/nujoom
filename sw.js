@@ -1,5 +1,5 @@
 // Keeps the app working without internet: network first, cached copy as fallback.
-const CACHE = "nujoom-v8";
+const CACHE = "nujoom-v9";
 const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icon-180.png", "./icon-512.png"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)));
