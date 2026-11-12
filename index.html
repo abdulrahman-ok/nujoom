@@ -408,7 +408,7 @@ function topBar(){
 function render(){
   applyLang();
   const app = $("#app");
-  if(view==="hub" && !cur()) view="who";
+  if(view==="hub" && !cur()) view=role?"who":"pending";
   if(view==="login") app.innerHTML = topBar()+loginView();
   else if(view==="pending") app.innerHTML = topBar()+pendingView();
   else if(view==="who") app.innerHTML = topBar()+whoView();
@@ -506,9 +506,11 @@ function bindWho(){
   document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=e=>{e.stopPropagation();
     const k=kids.find(x=>x.id===b.dataset.edit); if(!k) return;
     openPin(k, k.pin?"enter":"new", ()=>openEditor(k.id)); });
-  $("#guestBtn").onclick=()=>{ tone(784,.12,"triangle");
-    guest={id:"guest",name:t("guest"),avatar:"👤",color:"#e2cfff",stars:0,best:{}}; currentId="guest"; go("hub"); };
+  $("#guestBtn").onclick=startGuest;
 }
+// Guest play works on any device, even before sign-in or approval. Nothing is saved.
+function startGuest(){ tone(784,.12,"triangle");
+  guest={id:"guest",name:t("guest"),avatar:"👤",color:"#e2cfff",stars:0,best:{}}; currentId="guest"; go("hub"); }
 
 function hubView(){
   const k = cur(), b = k.best||{};
@@ -531,7 +533,7 @@ function hubView(){
 }
 function bindHub(){
   document.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{tone(660,.1,"triangle");go(b.dataset.g)});
-  $("#switch").onclick=()=>go("who");
+  $("#switch").onclick=()=>go(role?"who":"pending");
 }
 
 function gameShell(){
@@ -835,10 +837,12 @@ function pendingView(){
           <button class="big" type="submit" id="reqBtn">${t("sendReq")}</button>
         </form>`}
       <button class="danger" id="iAmAdmin">🔐 ${t("iAmAdmin")}</button>
-    </div>`;
+    </div>
+    <div class="row"><button class="guest-btn" id="guestBtn">👤 ${t("guestBtn")}</button></div>`;
 }
 function bindPending(){
   $("#iAmAdmin").onclick=()=>go("login");
+  $("#guestBtn").onclick=startGuest;
   const f=$("#reqForm");
   if(f) f.onsubmit=async e=>{
     e.preventDefault();
@@ -1036,7 +1040,7 @@ function asDevice(){
         reqUnsub=F.onSnapshot(F.doc(F.db,"requests",uid), r=>{ myRequest=r.exists()?r.data():null; if(view==="pending") render(); }, e=>console.warn(e));
         unsubs.push(()=>reqUnsub&&reqUnsub());
       }
-      if(view!=="pending" && view!=="login") go("pending");
+      if(view!=="pending" && view!=="login" && !isGuest()) go("pending");
     }
   }, err=>{ console.warn(err); setSync("off"); }));
 }
