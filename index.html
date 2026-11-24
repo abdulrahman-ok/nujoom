@@ -89,7 +89,32 @@ h2{font-size:1.4rem;font-weight:800}
 .game .t{font-size:1.5rem;font-weight:800}
 .game .d{font-size:1.05rem;opacity:.8}
 .game .best{margin-top:auto;font-size:.95rem;font-weight:700;background:rgba(255,255,255,.55);align-self:flex-start;padding:3px 12px;border-radius:999px;font-variant-numeric:tabular-nums}
-.g-mem{background:#ffd9ec}.g-sim{background:#c9f5e7}.g-tap{background:#fff1b8}
+.g-mem{background:#ffd9ec}.g-sim{background:#c9f5e7}.g-tap{background:#fff1b8}.g-math{background:#d6e4ff}
+.mt-setup{display:flex;flex-direction:column;align-items:center;gap:18px;width:min(100%,560px)}
+.mt-group{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%}
+.mt-q{font-size:1.3rem;font-weight:800}
+.mt-opts{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.mt-op{width:78px;height:78px;border-radius:22px;background:rgba(255,255,255,.14);color:var(--ink);border:3px solid rgba(255,255,255,.3);font-size:2.2rem;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.mt-op small{font-size:.8rem;font-weight:700;margin-top:4px}
+.mt-op.on,.mt-pill.on{background:var(--card);color:var(--card-ink);border-color:var(--star);box-shadow:0 4px 0 var(--star-deep)}
+.mt-pill{background:rgba(255,255,255,.14);color:var(--ink);border:3px solid rgba(255,255,255,.3);border-radius:999px;padding:8px 18px;font-size:1.15rem;font-weight:800}
+.mt-pill small{font-size:.85rem;color:#8a5a00}
+.mt-hint{color:var(--ink-soft);text-align:center;max-width:440px;font-size:1rem;line-height:1.5}
+.mt-play{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%}
+.mt-eq{display:flex;gap:.3em;align-items:center;justify-content:center;flex-wrap:nowrap;white-space:nowrap;font-size:clamp(1.7rem,8vw,4.4rem);font-weight:800;background:var(--card);color:var(--card-ink);border-radius:28px;padding:10px clamp(14px,4vw,28px);min-width:min(100%,420px);max-width:100%;box-shadow:0 6px 0 #c9b8f0;transition:background .15s}
+.mt-eq .op{color:var(--sky-bot)}
+.mt-eq .ans{min-width:1.6em;text-align:center;border-bottom:5px solid #d9cff5}
+.mt-eq .ans.empty{color:#b7a9e6}
+.mt-eq.good{background:#d8ffe9}
+.mt-eq.bad{background:#ffe0e4;animation:shake .4s}
+.mt-fb{min-height:1.6em;font-size:1.4rem;font-weight:800;color:#ffd0d6}
+.mt-choices{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:min(100%,420px)}
+.mt-choice{background:var(--card);color:var(--card-ink);border-radius:24px;padding:18px 8px;font-size:2.2rem;font-weight:800;box-shadow:0 6px 0 #c9b8f0}
+.mt-choice:active{transform:translateY(3px);box-shadow:0 3px 0 #c9b8f0}
+.mt-choice.good{background:#9ff0c6}
+.mt-choice.bad{background:#ffb3bf}
+.mt-keys .key{background:var(--card)}
+.key-ok{background:#9ff0c6 !important;color:#145c3a}
 .soon{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
 .locked{border-radius:24px;padding:16px 18px;border:2px dashed rgba(255,255,255,.35);display:flex;gap:12px;align-items:center;color:var(--ink-soft)}
 .locked .ico{font-size:34px}
@@ -234,13 +259,22 @@ const T = {
     duration:"المدة", bestTapMode:(n,m)=>`أعلى نقاط (${m}): ${n}`,
     tasks:"مهامي اليومية", tasksD:"رتبي غرفتك واكسبي نجوم",
     learn:"تعلّم والعب", learnD:"رياضيات وإنجليزي بنجوم أكثر",
+    math:"أبطال الحساب", mathD:"جمع وطرح وضرب وقسمة، واختاري الصعوبة!",
+    mtOpsQ:"وش تبين تحلين؟", mt_add:"جمع", mt_sub:"طرح", mt_mul:"ضرب", mt_div:"قسمة",
+    mtLvlQ:"وش الصعوبة؟", mtEasy:"سهل", mtMid:"متوسط", mtHard:"صعب",
+    mtEasyD:"أرقام صغيرة لين ٢٠، وجدول ١ إلى ٥. تختارين الجواب من ٤.", mtMidD:"أرقام لين ١٠٠، وجدول ١ إلى ١٠. تكتبين الجواب بنفسك.",
+    mtHardD:"أرقام لين ١٠٠٠، وجدول لين ١٢. تكتبين الجواب بنفسك.",
+    mtPractice:"تدريب", mtTimedD:"جاوبي أكثر أسئلة صح في دقيقة.", mtSurvD:"ما فيه وقت، بس أول غلطة تنهي اللعبة!",
+    mtPracticeD:"بدون وقت وبدون خسارة. إذا غلطتي يطلع لك الجواب وتكملين.",
+    mtAnswer:"الجواب", mtLost:"أوه! غلطة 💣", mtFinish:"خلّصت", bestMath:(n,m)=>`أعلى نتيجة (${m}): ${n}`,
+    tryAgain:"حاولي مرة ثانية 💪", noStars:"ما كسبتي نجوم هالمرة",
     moves:"حركات", pairs:"أزواج", level:"المستوى", score:"النقاط",
     bestMoves:n=>`أفضل نتيجة: ${n} حركة`, bestMemSize:(n,c)=>`أفضل نتيجة (${c} بطاقة): ${n} حركة`,
     memPick:"كم بطاقة تبين؟", cards:"بطاقة", memEasy:"سهلة", memHard:"صعبة", bestLevel:n=>`أعلى مستوى: ${n}`,
     simPick:"كم لون تبين؟", colors:"ألوان", fast:"ضاعفي السرعة", normalSpeed:"سرعة عادية", bestSimMode:(n,m)=>`أعلى مستوى (${m}): ${n}`, bestScore:n=>`أعلى نقاط: ${n}`, none:"ما لعبتيها للحين",
     back:"رجوع", start:"ابدئي", again:"مرة ثانية", home:"الألعاب",
     watch:"ركّزي…", yourTurn:"دورك!", oops:"أوه! خلص الدور",
-    win:"برافو!", got:n=>`كسبتي ${n} نجوم`, newBest:"رقم قياسي جديد! 🎉",
+    win:"برافو!", got:n=>`كسبتي ${n} ${n==="١"||n==="1"?"نجمة":"نجوم"}`, newBest:"رقم قياسي جديد! 🎉",
     edit:"تعديل", name:"الاسم", avatar:"الصورة", color:"اللون", save:"حفظ", cancel:"إلغاء",
     remove:"حذف هذا الملف", sure:"متأكد؟ اضغط مرة ثانية للحذف",
     defName:"اسم البنت", lang:"English",
@@ -282,6 +316,15 @@ const T = {
     duration:"Time", bestTapMode:(n,m)=>`Best score (${m}): ${n}`,
     tasks:"My Daily Tasks", tasksD:"Tidy your room and earn stars",
     learn:"Learn & Play", learnD:"Math and Arabic for even more stars",
+    math:"Math Heroes", mathD:"Add, subtract, multiply and divide. Pick how hard!",
+    mtOpsQ:"What do you want to solve?", mt_add:"Add", mt_sub:"Subtract", mt_mul:"Multiply", mt_div:"Divide",
+    mtLvlQ:"How hard?", mtEasy:"Easy", mtMid:"Medium", mtHard:"Hard",
+    mtEasyD:"Small numbers up to 20, times tables 1 to 5. Pick the answer from 4.", mtMidD:"Numbers up to 100, times tables 1 to 10. Type the answer yourself.",
+    mtHardD:"Numbers up to 1000, times tables up to 12. Type the answer yourself.",
+    mtPractice:"Practice", mtTimedD:"Answer as many as you can in one minute.", mtSurvD:"No time limit, but the first mistake ends the game!",
+    mtPracticeD:"No timer and no losing. If you get one wrong, you see the answer and keep going.",
+    mtAnswer:"Answer", mtLost:"Oops! A mistake 💣", mtFinish:"I'm done", bestMath:(n,m)=>`Best (${m}): ${n}`,
+    tryAgain:"Try again 💪", noStars:"No stars this time",
     moves:"Moves", pairs:"Pairs", level:"Level", score:"Score",
     bestMoves:n=>`Best: ${n} moves`, bestMemSize:(n,c)=>`Best (${c} cards): ${n} moves`,
     memPick:"How many cards?", cards:"cards", memEasy:"Easy", memHard:"Hard", bestLevel:n=>`Best level: ${n}`,
@@ -442,6 +485,7 @@ function render(){
   if(view==="g-mem") startMemory();
   if(view==="g-sim") startSimon();
   if(view==="g-tap") startTap();
+  if(view==="g-math") startMath();
 }
 function refreshStars(){
   const k=cur(), sc=document.querySelector(".starcount");
@@ -539,10 +583,13 @@ function hubView(){
       <button class="game g-sim" data-g="g-sim"><span class="ico">🎨</span><span class="t">${t("sim")}</span><span class="d">${t("simD")}</span><span class="best">${(()=>{ const m=simMode(), v=simBest(b,m.key); return v?t("bestSimMode")(num(v),simLabel(m)):t("none"); })()}</span></button>
       <button class="game g-tap" data-g="g-tap"><span class="ico">🌟</span><span class="t">${t("tap")}</span><span class="d">${t("tapD")}</span><span class="best">${(()=>{ const m=tapMode(), v=tapBest(b,m); return v?t("bestTapMode")(num(v),t(m==="s"?"tapSurv":"tapTimed")):t("none"); })()}</span></button>
     </div>
+    <h2>📚 ${t("learn")}</h2>
+    <div class="games">
+      <button class="game g-math" data-g="g-math"><span class="ico">🧮</span><span class="t">${t("math")}</span><span class="d">${t("mathD")}</span><span class="best">${(()=>{ const c=mtCfg(), v=b[c.key]; return v?t("bestMath")(num(v),mtModeName(c.mode)+" · "+mtLvlName(c.lvl)):t("none"); })()}</span></button>
+    </div>
     <h2>${t("soon")}</h2>
     <div class="soon">
       <div class="locked"><span class="ico">📋</span><span><b>${t("tasks")}</b>${t("tasksD")}</span></div>
-      <div class="locked"><span class="ico">📚</span><span><b>${t("learn")}</b>${t("learnD")}</span></div>
     </div>`;
 }
 function bindHub(){
@@ -551,7 +598,7 @@ function bindHub(){
 }
 
 function gameShell(){
-  const name = {"g-mem":t("mem"),"g-sim":t("sim"),"g-tap":t("tap")}[view];
+  const name = {"g-mem":t("mem"),"g-sim":t("sim"),"g-tap":t("tap"),"g-math":t("math")}[view];
   return `<div class="gamehead"><button class="ghost" id="back">${lang==="ar"?"→":"←"} ${t("back")}</button><h2>${name}</h2><div class="hud" id="hud"></div></div>
     <div class="stage" id="stage"></div>`;
 }
@@ -565,20 +612,20 @@ function reward(game, value, better, stars, line){
   const isBest = prev==null || better(value,prev);
   if(isBest) k.best[game]=value;
   k.stars = (k.stars||0)+stars;
-  if(!isGuest()){ cacheKids(); cloudReward(k,stars,game,value,isBest); }
+  if(!isGuest() && (stars>0 || isBest)){ cacheKids(); cloudReward(k,stars,game,value,isBest); }
   refreshStars();
-  chime();
+  if(stars>0) chime(); else tone(440,.2,"triangle");
   const starsHtml = Array.from({length:stars},(_,i)=>`<span style="animation-delay:${i*.12}s">⭐</span>`).join("");
   $("#layer").innerHTML = `<div class="overlay"><div class="sheet" role="dialog" aria-modal="true">
-    <h2>${t("win")}</h2>
-    <div class="won" aria-hidden="true">${starsHtml}</div>
-    <div style="font-size:1.4rem;font-weight:800">${t("got")(num(stars))}</div>
+    <h2>${stars>0?t("win"):t("tryAgain")}</h2>
+    ${stars>0?`<div class="won" aria-hidden="true">${starsHtml}</div>`:""}
+    <div style="font-size:1.4rem;font-weight:800">${stars>0?t("got")(num(stars)):t("noStars")}</div>
     <div style="font-size:1.1rem">${line}</div>
     ${isBest && prev!=null ? `<div style="font-size:1.2rem;font-weight:800;color:#c05a00">${t("newBest")}</div>`:""}
     <div class="row"><button class="big" id="again">${t("again")}</button><button class="ghost soft" id="toHub">${t("home")}</button></div>
   </div></div>`;
   $("#again").onclick=()=>{ $("#layer").innerHTML=""; go(view); };
-  $("#toHub").onclick=()=>{ memAgain=false; simAgain=false; tapAgain=false; $("#layer").innerHTML=""; go("hub"); };
+  $("#toHub").onclick=()=>{ memAgain=false; simAgain=false; tapAgain=false; mtAgain=false; $("#layer").innerHTML=""; go("hub"); };
 }
 
 // ================= game 1: memory =================
@@ -771,6 +818,155 @@ function playTap(mode){
   }
   spawn(); spawn();
   tick=setInterval(()=>{ sec++; hud(); if(timed && sec>=LIMIT) end(t("timeUp")); },1000);
+}
+
+// ================= learn 1: math heroes =================
+// Settings are remembered per device: which operations, how hard, and how to play.
+const MT_OPS=["add","sub","mul","div"], MT_SIGN={add:"+",sub:"−",mul:"×",div:"÷"};
+const MT_LEVELS=["e","m","h"], MT_MODES=["t","s","p"];
+const mtCfg=()=>{
+  let ops=LS.get("nj_mtops",["add","sub"]); if(!Array.isArray(ops)) ops=["add","sub"];
+  ops=ops.filter(o=>MT_OPS.includes(o)); if(!ops.length) ops=["add"];
+  const lvl=MT_LEVELS.includes(LS.get("nj_mtlvl","e"))?LS.get("nj_mtlvl","e"):"e";
+  const mode=MT_MODES.includes(LS.get("nj_mtmode","t"))?LS.get("nj_mtmode","t"):"t";
+  return {ops,lvl,mode,key:"mt_"+mode+"_"+lvl};
+};
+const mtModeName=m=>t(m==="t"?"tapTimed":m==="s"?"tapSurv":"mtPractice");
+const mtLvlName=l=>t(l==="e"?"mtEasy":l==="m"?"mtMid":"mtHard");
+let mtAgain=false;
+
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+// One question for the chosen operation and level. Subtraction never goes below zero,
+// and division always comes out even (it is built from a multiplication).
+function mtQuestion(op,lvl){
+  let a,b,ans;
+  if(op==="add"){
+    if(lvl==="e"){ a=rnd(1,10); b=rnd(1,10); }
+    else if(lvl==="m"){ a=rnd(5,95); b=rnd(1,100-a); }
+    else { a=rnd(100,999); b=rnd(10,999); }
+    ans=a+b;
+  } else if(op==="sub"){
+    if(lvl==="e"){ a=rnd(2,20); b=rnd(1,a); }
+    else if(lvl==="m"){ a=rnd(10,100); b=rnd(1,a); }
+    else { a=rnd(100,999); b=rnd(10,a); }
+    ans=a-b;
+  } else {
+    let x,y;
+    if(lvl==="e"){ x=rnd(1,5); y=rnd(1,10); }
+    else if(lvl==="m"){ x=rnd(2,10); y=rnd(1,10); }
+    else if(Math.random()<.3){ x=rnd(2,9); y=rnd(11,30); }
+    else { x=rnd(2,12); y=rnd(2,12); }
+    if(Math.random()<.5) [x,y]=[y,x];
+    if(op==="mul"){ a=x; b=y; ans=x*y; }
+    else { if(x===0) x=1; a=x*y; b=x; ans=y; }
+  }
+  return {a,b,op,ans};
+}
+// Three wrong answers close to the right one, never negative, all different.
+function mtChoices(q){
+  const set=new Set([q.ans]);
+  const near=[1,2,3,4,5,10];
+  let guard=0;
+  while(set.size<4 && guard++<100){
+    const d=near[rnd(0,near.length-1)]*(Math.random()<.5?-1:1), v=q.ans+d;
+    if(v>=0) set.add(v);
+  }
+  return [...set].sort(()=>Math.random()-.5);
+}
+
+function startMath(){
+  bindBack();
+  if(mtAgain){ mtAgain=false; playMath(mtCfg()); return; }
+  $("#hud").innerHTML="";
+  let c=mtCfg();
+  const b=(cur()||{}).best||{};
+  const draw=()=>{
+    $("#stage").innerHTML=`<div class="mt-setup">
+      <div class="mt-group"><div class="mt-q">${t("mtOpsQ")}</div>
+        <div class="mt-opts">${MT_OPS.map(o=>`<button class="mt-op${c.ops.includes(o)?" on":""}" data-op="${o}" aria-pressed="${c.ops.includes(o)}" aria-label="${t("mt_"+o)}">${MT_SIGN[o]}<small>${t("mt_"+o)}</small></button>`).join("")}</div></div>
+      <div class="mt-group"><div class="mt-q">${t("mtLvlQ")}</div>
+        <div class="mt-opts">${MT_LEVELS.map(l=>`<button class="mt-pill${c.lvl===l?" on":""}" data-lvl="${l}" aria-pressed="${c.lvl===l}">${l==="e"?"🟢":l==="m"?"🟡":"🔴"} ${mtLvlName(l)}</button>`).join("")}</div>
+        <div class="mt-hint">${t(c.lvl==="e"?"mtEasyD":c.lvl==="m"?"mtMidD":"mtHardD")}</div></div>
+      <div class="mt-group"><div class="mt-q">${t("tapPick")}</div>
+        <div class="mt-opts">${MT_MODES.map(m=>{ const best=m==="p"?null:b["mt_"+m+"_"+c.lvl];
+          return `<button class="mt-pill${c.mode===m?" on":""}" data-mode="${m}" aria-pressed="${c.mode===m}">${m==="t"?"⏱️":m==="s"?"💣":"📝"} ${mtModeName(m)}${best?` <small>🏆 ${num(best)}</small>`:""}</button>`; }).join("")}</div>
+        <div class="mt-hint">${t(c.mode==="t"?"mtTimedD":c.mode==="s"?"mtSurvD":"mtPracticeD")}</div></div>
+      <button class="big" id="go">${t("start")}</button></div>`;
+    document.querySelectorAll("[data-op]").forEach(x=>x.onclick=()=>{
+      let ops=c.ops.includes(x.dataset.op)?c.ops.filter(o=>o!==x.dataset.op):[...c.ops,x.dataset.op];
+      if(!ops.length) return;               // at least one operation stays on
+      LS.set("nj_mtops",MT_OPS.filter(o=>ops.includes(o))); c=mtCfg(); tone(620,.07,"triangle"); draw(); });
+    document.querySelectorAll("[data-lvl]").forEach(x=>x.onclick=()=>{ LS.set("nj_mtlvl",x.dataset.lvl); c=mtCfg(); tone(660,.07,"triangle"); draw(); });
+    document.querySelectorAll("[data-mode]").forEach(x=>x.onclick=()=>{ LS.set("nj_mtmode",x.dataset.mode); c=mtCfg(); tone(700,.07,"triangle"); draw(); });
+    $("#go").onclick=()=>playMath(c);
+  };
+  draw();
+}
+
+function playMath(c){
+  const LIMIT=60, choices=c.lvl==="e";
+  let q=null, last="", entry="", right=0, wrong=0, sec=0, busy=false, over=false, alive=true, timers=[], tick=null;
+  const onKey=e=>{ if(choices||busy||over) return;
+    if(/^[0-9]$/.test(e.key)) press(e.key); else if(e.key==="Backspace") press("del"); else if(e.key==="Enter") press("ok"); };
+  cleanup=()=>{ alive=false; timers.forEach(clearTimeout); clearInterval(tick); document.removeEventListener("keydown",onKey); };
+  document.addEventListener("keydown",onKey);
+  const hud=()=>$("#hud").innerHTML=`<span class="pill">✅ ${num(right)}</span>${c.mode==="p"?`<span class="pill">❌ ${num(wrong)}</span>`:""}<span class="pill">⏱ ${c.mode==="t"?num(LIMIT-sec):mmss(sec)}</span>`;
+  $("#stage").innerHTML=`<div class="mt-play">
+    <div class="mt-eq" id="eq" dir="ltr"></div>
+    <div class="mt-fb" id="fb"></div>
+    ${choices?`<div class="mt-choices" id="ch"></div>`
+      :`<div class="keypad mt-keys" dir="ltr">${["1","2","3","4","5","6","7","8","9","del","0","ok"].map(k=>
+        k==="del"?`<button class="key key-x" data-mk="del" aria-label="${t("del")}">⌫</button>`
+        :k==="ok"?`<button class="key key-ok" data-mk="ok" aria-label="✓">✓</button>`
+        :`<button class="key" data-mk="${k}">${num(k)}</button>`).join("")}</div>`}
+    ${c.mode==="p"?`<button class="ghost" id="mtEnd">🏁 ${t("mtFinish")}</button>`:""}
+  </div>`;
+  const eq=$("#eq"), fb=$("#fb");
+  const showEq=()=>{ eq.innerHTML=`<span>${num(q.a)}</span><span class="op">${MT_SIGN[q.op]}</span><span>${num(q.b)}</span><span class="op">=</span><span class="ans${entry===""?" empty":""}">${entry===""?"؟":entry.split("").map(num).join("")}</span>`; };
+  function next(){
+    entry=""; fb.textContent=""; fb.className="mt-fb"; eq.classList.remove("good","bad");
+    let k=0; do{ q=mtQuestion(c.ops[rnd(0,c.ops.length-1)],c.lvl); }while(q.a+q.op+q.b===last && k++<10);
+    last=q.a+q.op+q.b; showEq(); busy=false;
+    if(choices){
+      $("#ch").innerHTML=mtChoices(q).map(v=>`<button class="mt-choice" data-v="${v}">${num(v)}</button>`).join("");
+      document.querySelectorAll(".mt-choice").forEach(x=>x.onclick=()=>answer(+x.dataset.v,x));
+    }
+  }
+  function answer(v,btn){
+    if(busy||over) return; busy=true;
+    entry=String(v); showEq();
+    if(v===q.ans){
+      right++; hud(); eq.classList.add("good"); tone(880+Math.min(right,12)*30,.12,"triangle");
+      if(btn) btn.classList.add("good");
+      timers.push(setTimeout(()=>alive&&!over&&next(),450));
+    } else {
+      wrong++; hud(); eq.classList.add("bad"); tone(170,.3,"sawtooth",.1);
+      if(btn){ btn.classList.add("bad"); const ok=[...document.querySelectorAll(".mt-choice")].find(x=>+x.dataset.v===q.ans); if(ok) ok.classList.add("good"); }
+      fb.className="mt-fb show"; fb.textContent=`${t("mtAnswer")}: ${num(q.ans)}`;
+      if(c.mode==="s"){ timers.push(setTimeout(()=>alive&&end(t("mtLost")),1300)); return; }
+      timers.push(setTimeout(()=>alive&&!over&&next(),1400));
+    }
+  }
+  function press(k){
+    if(busy||over) return;
+    if(k==="del"){ entry=entry.slice(0,-1); showEq(); return; }
+    if(k==="ok"){ if(entry!=="") answer(+entry); return; }
+    if(entry.length>=4) return;
+    entry=(entry==="0"?"":entry)+k; tone(600,.04,"triangle",.08); showEq();
+  }
+  if(!choices) document.querySelectorAll("[data-mk]").forEach(x=>x.onclick=()=>press(x.dataset.mk));
+  function end(why){
+    if(over) return; over=true; clearInterval(tick); timers.forEach(clearTimeout);
+    // Stars: the harder the level, the fewer right answers each star needs (max 5).
+    const per = c.mode==="t" ? {e:6,m:5,h:4}[c.lvl] : c.mode==="s" ? {e:5,m:4,h:3}[c.lvl] : {e:10,m:8,h:6}[c.lvl];
+    const s = Math.min(c.mode==="p"?3:5, Math.floor(right/per));
+    const line = `${mtModeName(c.mode)} · ${mtLvlName(c.lvl)} · ✅ ${num(right)}${c.mode!=="t"?` · ${t("duration")}: ${mmss(sec)}`:""}`;
+    setTimeout(()=>{ if(!alive) return; mtAgain=true;
+      reward(c.mode==="p"?"mt_p":c.key, right, (v,p)=>c.mode!=="p"&&v>p, s, (why?why+"<br>":"")+line); }, c.mode==="p"?0:500);
+  }
+  if(c.mode==="p") $("#mtEnd").onclick=()=>end("");
+  hud(); next();
+  tick=setInterval(()=>{ sec++; hud(); if(c.mode==="t" && sec>=LIMIT) end(t("timeUp")); },1000);
 }
 
 // ================= profile editor =================
