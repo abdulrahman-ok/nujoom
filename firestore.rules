@@ -44,6 +44,19 @@ service cloud.firestore {
       allow delete: if isAdmin() || (signedIn() && request.auth.uid == deviceId);
     }
 
+    // Drawings gallery: approved devices add drawings and everyone sees them; only the admin deletes.
+    match /drawings/{drawingId} {
+      allow read: if isAdmin() || isDevice();
+      allow create: if (isAdmin() || isDevice())
+        && request.resource.data.keys().hasOnly(['kid', 'at', 'mode', 'img', 'topic'])
+        && request.resource.data.kid is string && request.resource.data.kid.size() <= 40
+        && request.resource.data.mode in ['free', 'color', 'challenge']
+        && request.resource.data.img is string && request.resource.data.img.size() < 700000
+        && request.resource.data.topic is string && request.resource.data.topic.size() <= 60
+        && request.resource.data.at == request.time;
+      allow delete: if isAdmin();
+    }
+
     // Older setup, kept only so the admin's earlier data can be moved over.
     match /users/{userId}/kids/{kidId} {
       allow read, delete: if signedIn() && request.auth.uid == userId;

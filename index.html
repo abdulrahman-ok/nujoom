@@ -24,6 +24,7 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
 html,body{height:100%}
 body{
   margin:0;font-family:var(--font);color:var(--ink);
@@ -89,7 +90,43 @@ h2{font-size:1.4rem;font-weight:800}
 .game .t{font-size:1.5rem;font-weight:800}
 .game .d{font-size:1.05rem;opacity:.8}
 .game .best{margin-top:auto;font-size:.95rem;font-weight:700;background:rgba(255,255,255,.55);align-self:flex-start;padding:3px 12px;border-radius:999px;font-variant-numeric:tabular-nums}
-.g-mem{background:#ffd9ec}.g-sim{background:#c9f5e7}.g-tap{background:#fff1b8}.g-math{background:#d6e4ff}
+.g-mem{background:#ffd9ec}.g-sim{background:#c9f5e7}.g-tap{background:#fff1b8}.g-math{background:#d6e4ff}.g-draw{background:#ffe1cc}
+.modes.drmodes{grid-template-columns:repeat(3,minmax(0,1fr));width:min(100%,640px)}
+@media (max-width:560px){.modes.drmodes{grid-template-columns:1fr}}
+.pages{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;width:min(100%,640px)}
+@media (max-width:560px){.pages{grid-template-columns:1fr 1fr}}
+.page-btn{background:var(--card);color:var(--card-ink);border-radius:20px;padding:10px;display:flex;flex-direction:column;gap:6px;align-items:center;font-weight:800;font-size:1.1rem;box-shadow:0 6px 0 #c9b8f0}
+.page-btn canvas{width:100%;height:auto;border-radius:12px;border:2px solid #eee8ff}
+.dr-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%}
+.dr-topic{font-size:1.3rem;background:rgba(255,255,255,.14);border-radius:999px;padding:6px 18px}
+.dr-bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center}
+.dr-group{display:flex;gap:6px;background:rgba(255,255,255,.12);border-radius:16px;padding:5px}
+.dr-tool{width:48px;height:48px;border-radius:12px;background:transparent;font-size:1.6rem;line-height:1}
+.dr-tool.on{background:var(--card);box-shadow:0 3px 0 var(--star-deep)}
+.dr-size{width:44px;height:48px;border-radius:12px;background:transparent;display:grid;place-items:center}
+.dr-size i{display:block;border-radius:50%;background:var(--ink)}
+.dr-size.on{background:var(--card)} .dr-size.on i{background:var(--card-ink)}
+.dr-save{background:var(--star);color:var(--card-ink);border-radius:12px;padding:0 16px;height:48px;font-size:1.15rem;font-weight:800;box-shadow:0 3px 0 var(--star-deep)}
+.dr-pal{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;max-width:760px}
+.dr-col{width:38px;height:38px;border-radius:50%;border:3px solid rgba(255,255,255,.55);box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.dr-col.on{outline:4px solid var(--star);outline-offset:2px}
+.dr-stk{width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.14);font-size:1.7rem;line-height:1}
+.dr-stk.on{background:var(--card)}
+.dr-board{position:relative;width:min(100%,calc((100vh - 340px) * 4 / 3),1000px);aspect-ratio:4/3;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 6px 0 rgba(0,0,0,.18)}
+.dr-board canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+#lines{pointer-events:none}
+.dr-lock{position:absolute;inset:0;background:rgba(42,31,107,.55);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:2rem;font-weight:800;gap:6px}
+.dr-lock small{font-size:1.2rem}
+.dr-prev{width:100%;border-radius:14px;border:3px solid #eee8ff}
+.dr-big{width:100%;border-radius:16px;border:3px solid #eee8ff}
+.gal-wrap{display:flex;flex-direction:column;gap:12px;width:100%;align-self:stretch}
+.gal-filter{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.gal-item{background:var(--card);color:var(--card-ink);border-radius:18px;padding:8px;display:flex;flex-direction:column;gap:4px;align-items:center;font-weight:800;box-shadow:0 5px 0 #c9b8f0;min-width:0}
+.gal-item img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;background:#fff}
+.gal-item small{font-weight:600;opacity:.7;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,120px);background:var(--card);color:var(--card-ink);font-weight:800;padding:12px 20px;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:40;transition:transform .25s;max-width:calc(100% - 32px);text-align:center}
+.toast.show{transform:translate(-50%,0)}
 .mt-setup{display:flex;flex-direction:column;align-items:center;gap:18px;width:min(100%,560px)}
 .mt-group{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%}
 .mt-q{font-size:1.3rem;font-weight:800}
@@ -259,6 +296,16 @@ const T = {
     duration:"المدة", bestTapMode:(n,m)=>`أعلى نقاط (${m}): ${n}`,
     tasks:"مهامي اليومية", tasksD:"رتبي غرفتك واكسبي نجوم",
     learn:"تعلّم والعب", learnD:"رياضيات وإنجليزي بنجوم أكثر",
+    draw:"مرسم النجمات", drawD:"ارسمي ولوّني وتحدّي نفسك، ورسوماتك في المعرض!",
+    drPick:"وش تبين ترسمين؟", drFree:"رسم حر", drFreeD:"لوحة بيضاء لك، ارسمي اللي تبين.",
+    drColor:"تلوين", drColorD:"اختاري صورة ولوّنيها.", drChal:"تحدي الرسم", drChalD:"يطلع لك موضوع، وعندك دقيقتين ترسمينه.",
+    drGallery:"المعرض", drToday:(n,m)=>`نجوم الرسم اليوم: ${n} من ${m}`, drGuestNote:"الضيف يقدر يرسم، بس ما يقدر يحفظ.",
+    drPickPage:"اختاري صورة تلوّنينها", drDrawThis:"ارسمي", drSaveNow:"احفظي رسمتك 💾",
+    drBrush:"فرشاة", drEraser:"ممحاة", drFill:"تعبئة", drSticker:"ملصقات", drUndo:"تراجع", drClear:"مسح الكل",
+    drTooLittle:"ارسمي شوي أكثر قبل الحفظ ✏️", drNoNet:"ما فيه اتصال، جربي بعدين.", drSaveErr:"ما انحفظت الرسمة. اطلب من المسؤول يحدّث قواعد الأمان.",
+    drSaved:"انحفظت رسمتك 🖼️", drLimit:m=>`الرسمة في المعرض. وصلتي حد اليوم (${m} نجوم)، وبكرة تقدرين تكسبين أكثر!`,
+    drNew:"رسمة جديدة", drAll:"الكل", drGalEmpty:"ما فيه رسومات للحين. ارسمي أول رسمة! 🎨", drGalNeeds:"المعرض يحتاج جهاز موافق عليه.",
+    drDelete:"حذف الرسمة",
     math:"أبطال الحساب", mathD:"جمع وطرح وضرب وقسمة، واختاري الصعوبة!",
     mtOpsQ:"وش تبين تحلين؟", mt_add:"جمع", mt_sub:"طرح", mt_mul:"ضرب", mt_div:"قسمة",
     mtLvlQ:"وش الصعوبة؟", mtEasy:"سهل", mtMid:"متوسط", mtHard:"صعب",
@@ -316,6 +363,16 @@ const T = {
     duration:"Time", bestTapMode:(n,m)=>`Best score (${m}): ${n}`,
     tasks:"My Daily Tasks", tasksD:"Tidy your room and earn stars",
     learn:"Learn & Play", learnD:"Math and Arabic for even more stars",
+    draw:"Najmat Studio", drawD:"Draw, color and take on challenges. Your art goes in the gallery!",
+    drPick:"What do you want to draw?", drFree:"Free drawing", drFreeD:"A blank page. Draw anything you like.",
+    drColor:"Coloring", drColorD:"Pick a picture and color it.", drChal:"Drawing challenge", drChalD:"You get a topic and two minutes to draw it.",
+    drGallery:"Gallery", drToday:(n,m)=>`Drawing stars today: ${n} of ${m}`, drGuestNote:"Guests can draw but can't save.",
+    drPickPage:"Pick a picture to color", drDrawThis:"Draw", drSaveNow:"Save your drawing 💾",
+    drBrush:"Brush", drEraser:"Eraser", drFill:"Fill", drSticker:"Stickers", drUndo:"Undo", drClear:"Clear all",
+    drTooLittle:"Draw a little more before saving ✏️", drNoNet:"No connection. Try again later.", drSaveErr:"The drawing wasn't saved. Ask the admin to update the security rules.",
+    drSaved:"Your drawing is saved 🖼️", drLimit:m=>`It's in the gallery. You reached today's limit (${m} stars). Earn more tomorrow!`,
+    drNew:"New drawing", drAll:"All", drGalEmpty:"No drawings yet. Make the first one! 🎨", drGalNeeds:"The gallery needs an approved device.",
+    drDelete:"Delete drawing",
     math:"Math Heroes", mathD:"Add, subtract, multiply and divide. Pick how hard!",
     mtOpsQ:"What do you want to solve?", mt_add:"Add", mt_sub:"Subtract", mt_mul:"Multiply", mt_div:"Divide",
     mtLvlQ:"How hard?", mtEasy:"Easy", mtMid:"Medium", mtHard:"Hard",
@@ -486,6 +543,7 @@ function render(){
   if(view==="g-sim") startSimon();
   if(view==="g-tap") startTap();
   if(view==="g-math") startMath();
+  if(view==="g-draw") startDraw();
 }
 function refreshStars(){
   const k=cur(), sc=document.querySelector(".starcount");
@@ -581,6 +639,7 @@ function hubView(){
     <div class="games">
       <button class="game g-mem" data-g="g-mem"><span class="ico">🃏</span><span class="t">${t("mem")}</span><span class="d">${t("memD")}</span><span class="best">${(()=>{ const n=memSize(), v=memBest(b,n); return v?t("bestMemSize")(num(v),num(n)):t("none"); })()}</span></button>
       <button class="game g-sim" data-g="g-sim"><span class="ico">🎨</span><span class="t">${t("sim")}</span><span class="d">${t("simD")}</span><span class="best">${(()=>{ const m=simMode(), v=simBest(b,m.key); return v?t("bestSimMode")(num(v),simLabel(m)):t("none"); })()}</span></button>
+      <button class="game g-draw" data-g="g-draw"><span class="ico">🎨</span><span class="t">${t("draw")}</span><span class="d">${t("drawD")}</span><span class="best">${isGuest()?t("drGuestNote"):"⭐ "+t("drToday")(num(drCountToday(k)),num(DR_DAILY))}</span></button>
       <button class="game g-tap" data-g="g-tap"><span class="ico">🌟</span><span class="t">${t("tap")}</span><span class="d">${t("tapD")}</span><span class="best">${(()=>{ const m=tapMode(), v=tapBest(b,m); return v?t("bestTapMode")(num(v),t(m==="s"?"tapSurv":"tapTimed")):t("none"); })()}</span></button>
     </div>
     <h2>📚 ${t("learn")}</h2>
@@ -598,7 +657,7 @@ function bindHub(){
 }
 
 function gameShell(){
-  const name = {"g-mem":t("mem"),"g-sim":t("sim"),"g-tap":t("tap"),"g-math":t("math")}[view];
+  const name = {"g-mem":t("mem"),"g-sim":t("sim"),"g-tap":t("tap"),"g-math":t("math"),"g-draw":t("draw")}[view];
   return `<div class="gamehead"><button class="ghost" id="back">${lang==="ar"?"→":"←"} ${t("back")}</button><h2>${name}</h2><div class="hud" id="hud"></div></div>
     <div class="stage" id="stage"></div>`;
 }
@@ -969,6 +1028,261 @@ function playMath(c){
   tick=setInterval(()=>{ sec++; hud(); if(c.mode==="t" && sec>=LIMIT) end(t("timeUp")); },1000);
 }
 
+// ================= drawing studio =================
+const DR_W=1200, DR_H=900, DR_SIZES=[8,20,40], DR_STK=[70,120,190], DR_DAILY=3, DR_TIME=120;
+const DR_COLORS=["#1b1b1b","#ffffff","#9aa0a6","#8b5a2b","#f5c8a0","#e8333f","#ff9a1f","#ffe03a","#6fd63a","#1fa363","#22d3a5","#3b9dff","#1e4fd8","#9d6bff","#ff5fa8"];
+const DR_STICKERS=["⭐","❤️","🌸","🦋","🌈","☀️","🌙","☁️","🐱","🐶","🐰","🍓","🎈","👑","🎀","✨"];
+const DR_TOPICS={
+  ar:["سمكة في البحر","بيت أحلامك","قطة نايمة","شمس وغيوم","وردة كبيرة","سيارة سريعة","صاروخ في الفضاء","كيكة عيد ميلاد","فراشة ملوّنة","شجرة تفاح","قلعة أميرة","قوس قزح","عائلتك","حيوانك المفضل","بالونات طايرة","البحر والشاطئ","بطريق في الثلج","حديقة ورد"],
+  en:["A fish in the sea","Your dream house","A sleeping cat","Sun and clouds","A big flower","A fast car","A rocket in space","A birthday cake","A colorful butterfly","An apple tree","A princess castle","A rainbow","Your family","Your favorite animal","Flying balloons","The sea and the beach","A penguin in the snow","A flower garden"]};
+
+// Coloring pages: simple line art drawn in code, so nothing needs downloading.
+function drPath(c,fn){ c.beginPath(); fn(); c.stroke(); }
+const circle=(c,x,y,r)=>drPath(c,()=>c.arc(x,y,r,0,Math.PI*2));
+const ell=(c,x,y,rx,ry,rot=0)=>drPath(c,()=>c.ellipse(x,y,rx,ry,rot,0,Math.PI*2));
+const poly=(c,pts)=>drPath(c,()=>{ c.moveTo(pts[0][0],pts[0][1]); pts.slice(1).forEach(p=>c.lineTo(p[0],p[1])); c.closePath(); });
+const line=(c,x1,y1,x2,y2)=>drPath(c,()=>{ c.moveTo(x1,y1); c.lineTo(x2,y2); });
+const DR_PAGES=[
+  {id:"house", ico:"🏠", ar:"بيت", en:"House", draw:c=>{
+    line(c,0,790,1200,790);
+    c.strokeRect(310,430,500,360); poly(c,[[260,440],[560,190],[860,440]]);
+    c.strokeRect(510,610,110,180); circle(c,600,700,9);
+    c.strokeRect(360,500,110,90); line(c,415,500,415,590); line(c,360,545,470,545);
+    c.strokeRect(650,500,110,90); line(c,705,500,705,590); line(c,650,545,760,545);
+    circle(c,1060,150,70); for(let i=0;i<8;i++){ const a=i*Math.PI/4; line(c,1060+Math.cos(a)*90,150+Math.sin(a)*90,1060+Math.cos(a)*130,150+Math.sin(a)*130); }
+    c.strokeRect(985,600,50,190); circle(c,1010,520,105);
+    ell(c,230,150,110,55);
+  }},
+  {id:"cat", ico:"🐱", ar:"قطة", en:"Cat", draw:c=>{
+    poly(c,[[395,330],[420,110],[560,240]]); poly(c,[[640,240],[780,110],[805,330]]);
+    circle(c,600,490,260);
+    ell(c,505,440,48,62); ell(c,695,440,48,62); circle(c,505,450,18); circle(c,695,450,18);
+    poly(c,[[570,545],[630,545],[600,580]]);
+    drPath(c,()=>{ c.moveTo(600,580); c.quadraticCurveTo(570,640,520,615); }); drPath(c,()=>{ c.moveTo(600,580); c.quadraticCurveTo(630,640,680,615); });
+    [[-1,0],[-1,1],[1,0],[1,1]].forEach(([s,k])=>line(c,600+s*90,560+k*40,600+s*290,530+k*70));
+    ell(c,600,800,90,40);
+  }},
+  {id:"flower", ico:"🌸", ar:"وردة", en:"Flower", draw:c=>{
+    for(let i=0;i<8;i++){ const a=i*Math.PI/4; circle(c,600+Math.cos(a)*150,320+Math.sin(a)*150,88); }
+    circle(c,600,320,85);
+    c.strokeRect(585,470,30,300);
+    ell(c,500,640,90,38,-0.5); ell(c,700,700,90,38,0.5);
+    poly(c,[[420,770],[780,770],[720,890],[480,890]]); line(c,430,800,770,800);
+  }},
+  {id:"fish", ico:"🐟", ar:"سمكة", en:"Fish", draw:c=>{
+    poly(c,[[520,300],[620,170],[700,310]]);
+    ell(c,560,450,310,180);
+    poly(c,[[850,450],[1060,290],[1060,610]]);
+    circle(c,400,410,34); circle(c,400,410,12);
+    drPath(c,()=>{ c.moveTo(560,280); c.quadraticCurveTo(620,450,560,620); });
+    drPath(c,()=>{ c.moveTo(680,300); c.quadraticCurveTo(740,450,680,600); });
+    circle(c,250,230,32); circle(c,200,140,22); circle(c,260,70,15);
+    drPath(c,()=>{ c.moveTo(0,820); for(let x=0;x<=1200;x+=100) c.quadraticCurveTo(x+50,770,x+100,820); });
+    drPath(c,()=>{ c.moveTo(150,820); c.quadraticCurveTo(110,740,160,690); c.quadraticCurveTo(200,640,160,590); });
+    drPath(c,()=>{ c.moveTo(1000,820); c.quadraticCurveTo(1050,750,1010,700); c.quadraticCurveTo(970,650,1020,600); });
+  }},
+  {id:"butterfly", ico:"🦋", ar:"فراشة", en:"Butterfly", draw:c=>{
+    ell(c,410,330,200,140,-0.35); ell(c,790,330,200,140,0.35);
+    ell(c,450,600,150,110,0.4); ell(c,750,600,150,110,-0.4);
+    circle(c,400,320,50); circle(c,800,320,50); circle(c,450,610,40); circle(c,750,610,40);
+    ell(c,600,460,32,230);
+    circle(c,600,200,48);
+    drPath(c,()=>{ c.moveTo(580,160); c.quadraticCurveTo(540,80,500,70); }); circle(c,492,68,16);
+    drPath(c,()=>{ c.moveTo(620,160); c.quadraticCurveTo(660,80,700,70); }); circle(c,708,68,16);
+  }},
+  {id:"icecream", ico:"🍦", ar:"آيس كريم", en:"Ice cream", draw:c=>{
+    c.save(); c.beginPath(); c.moveTo(450,520); c.lineTo(750,520); c.lineTo(600,880); c.closePath(); c.clip();
+    for(let k=-6;k<8;k++){ line(c,400+k*60,520,400+k*60+400,920); line(c,800-k*60,520,800-k*60-400,920); }
+    c.restore(); poly(c,[[450,520],[750,520],[600,880]]);
+    circle(c,505,450,115); circle(c,695,450,115); circle(c,600,300,125);
+    circle(c,600,150,36); drPath(c,()=>{ c.moveTo(605,115); c.quadraticCurveTo(620,60,670,45); });
+  }}
+];
+function drawPage(c,page,scale=1){
+  c.save(); c.scale(scale,scale); c.lineWidth=9; c.lineJoin="round"; c.lineCap="round"; c.strokeStyle="#1b1b1b"; page.draw(c); c.restore();
+}
+
+const drToday=()=>{ const d=new Date(); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); };
+const drCountToday=k=>{ const v=String((k&&k.best&&k.best.drawDay)||""); const [d,n]=v.split(":"); return d===drToday()?(+n||0):0; };
+
+function toast(msg){
+  let el=$("#toast"); if(!el){ el=document.createElement("div"); el.id="toast"; el.className="toast"; document.body.appendChild(el); }
+  el.textContent=msg; el.classList.add("show"); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove("show"),2600);
+}
+const drLeave=()=>{ if(cleanup){ cleanup(); cleanup=null; } };
+
+function startDraw(){ bindBack(); drawMenu(); }
+function drawMenu(){
+  drLeave(); bindBack(); $("#hud").innerHTML="";
+  const k=cur(), n=drCountToday(k);
+  $("#stage").innerHTML=`<div class="msg">${t("drPick")}</div>
+    <div class="modes drmodes">
+      <button class="size mode" data-dm="free"><span class="sz-n">✏️</span><span class="tm-t">${t("drFree")}</span><span class="tm-d">${t("drFreeD")}</span></button>
+      <button class="size mode" data-dm="color"><span class="sz-n">🖍️</span><span class="tm-t">${t("drColor")}</span><span class="tm-d">${t("drColorD")}</span></button>
+      <button class="size mode" data-dm="challenge"><span class="sz-n">⏱️</span><span class="tm-t">${t("drChal")}</span><span class="tm-d">${t("drChalD")}</span></button>
+    </div>
+    <button class="speed" id="toGal">🖼️ ${t("drGallery")}</button>
+    ${isGuest()?`<p class="note">${t("drGuestNote")}</p>`:`<p class="note">⭐ ${t("drToday")(num(n),num(DR_DAILY))}</p>`}`;
+  document.querySelectorAll("[data-dm]").forEach(b=>b.onclick=()=>{ tone(660,.08,"triangle");
+    const m=b.dataset.dm; if(m==="color") pickPage(); else if(m==="free") openCanvas("free"); else openCanvas("challenge",null,randomTopic()); });
+  $("#toGal").onclick=openGallery;
+}
+const randomTopic=()=>{ const i=Math.floor(Math.random()*DR_TOPICS.ar.length); return {ar:DR_TOPICS.ar[i],en:DR_TOPICS.en[i]}; };
+
+function pickPage(){
+  drLeave(); $("#back").onclick=drawMenu; $("#hud").innerHTML="";
+  $("#stage").innerHTML=`<div class="msg">${t("drPickPage")}</div><div class="pages">${DR_PAGES.map(p=>`<button class="page-btn" data-pg="${p.id}"><canvas width="240" height="180"></canvas><span>${p.ico} ${p[lang]}</span></button>`).join("")}</div>`;
+  document.querySelectorAll("[data-pg]").forEach(b=>{
+    const cv=b.querySelector("canvas"), c=cv.getContext("2d"); c.fillStyle="#fff"; c.fillRect(0,0,240,180); drawPage(c,DR_PAGES.find(p=>p.id===b.dataset.pg),.2);
+    b.onclick=()=>{ tone(660,.08,"triangle"); openCanvas("color",DR_PAGES.find(p=>p.id===b.dataset.pg)); };
+  });
+}
+
+function openCanvas(mode,page=null,topic=null){
+  drLeave(); $("#back").onclick=drawMenu;
+  let tool="brush", color=mode==="color"?"#ff5fa8":"#1b1b1b", size=1, sticker="⭐", locked=false, left=DR_TIME, tick=null;
+  const ops=[]; let curOp=null, pid=null;
+  const title = topic ? topic[lang] : page ? `${page.ico} ${page[lang]}` : "";
+  const toolBtn=(id,ico,label)=>`<button class="dr-tool${tool===id?" on":""}" data-tool="${id}" aria-label="${label}" title="${label}">${ico}</button>`;
+  $("#stage").innerHTML=`<div class="dr-wrap">
+    ${title?`<div class="dr-topic">${topic?"✏️ "+t("drDrawThis")+": ":""}<b>${esc(title)}</b></div>`:""}
+    <div class="dr-bar" id="bar"></div>
+    <div class="dr-pal" id="pal"></div>
+    <div class="dr-board" id="board"><canvas id="paint" width="${DR_W}" height="${DR_H}"></canvas>${page?`<canvas id="lines" width="${DR_W}" height="${DR_H}"></canvas>`:""}<div class="dr-lock" id="lock" hidden>⏰ ${t("timeUp")}<small>${t("drSaveNow")}</small></div></div>
+  </div>`;
+  const paint=$("#paint"), pc=paint.getContext("2d",{willReadFrequently:true});
+  let lineMask=null, linesCv=null;
+  if(page){ linesCv=$("#lines"); const lc=linesCv.getContext("2d",{willReadFrequently:true}); drawPage(lc,page);
+    const d=lc.getImageData(0,0,DR_W,DR_H).data; lineMask=new Uint8Array(DR_W*DR_H); for(let i=0;i<lineMask.length;i++) lineMask[i]=d[i*4+3]>110?1:0; }
+  const bar=()=>{ $("#bar").innerHTML=`<div class="dr-group">${toolBtn("brush","🖌️",t("drBrush"))}${toolBtn("eraser","🧽",t("drEraser"))}${toolBtn("fill","🪣",t("drFill"))}${toolBtn("sticker","😀",t("drSticker"))}</div>
+      <div class="dr-group">${DR_SIZES.map((s,i)=>`<button class="dr-size${size===i?" on":""}" data-size="${i}" aria-label="${i+1}"><i style="width:${8+i*8}px;height:${8+i*8}px"></i></button>`).join("")}</div>
+      <div class="dr-group"><button class="dr-tool" id="undo" aria-label="${t("drUndo")}" title="${t("drUndo")}">↩️</button><button class="dr-tool" id="clear" aria-label="${t("drClear")}" title="${t("drClear")}">🗑️</button><button class="dr-save" id="save">💾 ${t("save")}</button></div>`;
+    document.querySelectorAll("[data-tool]").forEach(b=>b.onclick=()=>{ tool=b.dataset.tool; bar(); pal(); });
+    document.querySelectorAll("[data-size]").forEach(b=>b.onclick=()=>{ size=+b.dataset.size; bar(); });
+    $("#undo").onclick=()=>{ if(locked||!ops.length) return; ops.pop(); replay(); };
+    twoTap($("#clear"),()=>{ if(locked) return; ops.length=0; replay(); bar(); });
+    $("#save").onclick=save; };
+  const pal=()=>{ $("#pal").innerHTML = tool==="sticker"
+      ? DR_STICKERS.map(s=>`<button class="dr-stk${s===sticker?" on":""}" data-stk="${s}">${s}</button>`).join("")
+      : DR_COLORS.map(c=>`<button class="dr-col${c===color?" on":""}" data-col="${c}" style="background:${c}" aria-label="${c}"></button>`).join("");
+    document.querySelectorAll("[data-col]").forEach(b=>b.onclick=()=>{ color=b.dataset.col; if(tool==="eraser") tool="brush"; bar(); pal(); });
+    document.querySelectorAll("[data-stk]").forEach(b=>b.onclick=()=>{ sticker=b.dataset.stk; pal(); }); };
+  bar(); pal();
+
+  function strokeOp(c,op,from=0){
+    c.save(); c.globalCompositeOperation=op.e?"destination-out":"source-over";
+    c.strokeStyle=op.c; c.fillStyle=op.c; c.lineWidth=op.s; c.lineCap="round"; c.lineJoin="round";
+    const p=op.p;
+    if(p.length===1){ c.beginPath(); c.arc(p[0][0],p[0][1],op.s/2,0,Math.PI*2); c.fill(); }
+    else { c.beginPath(); c.moveTo(p[Math.max(0,from-1)][0],p[Math.max(0,from-1)][1]); for(let i=Math.max(1,from);i<p.length;i++) c.lineTo(p[i][0],p[i][1]); c.stroke(); }
+    c.restore();
+  }
+  function fillOp(op){
+    const img=pc.getImageData(0,0,DR_W,DR_H), d=img.data, W=DR_W, H=DR_H;
+    const x0=Math.max(0,Math.min(W-1,Math.round(op.x))), y0=Math.max(0,Math.min(H-1,Math.round(op.y)));
+    const r=parseInt(op.c.slice(1,3),16), g=parseInt(op.c.slice(3,5),16), bl=parseInt(op.c.slice(5,7),16);
+    const px=i=>{ const a=d[i*4+3]; return a<20?[255,255,255]:[d[i*4],d[i*4+1],d[i*4+2]]; };
+    const start=px(y0*W+x0);
+    const inside = lineMask ? (i=>!lineMask[i]) : (i=>{ const q=px(i); return Math.abs(q[0]-start[0])+Math.abs(q[1]-start[1])+Math.abs(q[2]-start[2])<60; });
+    if(!inside(y0*W+x0)) return;
+    const seen=new Uint8Array(W*H), stack=[x0,y0];
+    while(stack.length){
+      const y=stack.pop(); let x=stack.pop();
+      let i=y*W+x; while(x>0 && !seen[i-1] && inside(i-1)){ x--; i--; }
+      let up=false, down=false;
+      for(; x<W && !seen[i] && inside(i); x++, i++){
+        seen[i]=1; d[i*4]=r; d[i*4+1]=g; d[i*4+2]=bl; d[i*4+3]=255;
+        if(y>0){ const u=i-W; if(!seen[u]&&inside(u)){ if(!up){ stack.push(x,y-1); up=true; } } else up=false; }
+        if(y<H-1){ const v=i+W; if(!seen[v]&&inside(v)){ if(!down){ stack.push(x,y+1); down=true; } } else down=false; }
+      }
+    }
+    pc.putImageData(img,0,0);
+  }
+  function stickerOp(c,op){ c.save(); c.font=`${op.s}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; c.textAlign="center"; c.textBaseline="middle"; c.fillText(op.t,op.x,op.y); c.restore(); }
+  function run(op){ if(op.type==="stroke") strokeOp(pc,op); else if(op.type==="fill") fillOp(op); else stickerOp(pc,op); }
+  function replay(){ pc.clearRect(0,0,DR_W,DR_H); ops.forEach(run); }
+
+  const pos=e=>{ const r=paint.getBoundingClientRect(); return [ (e.clientX-r.left)*DR_W/r.width, (e.clientY-r.top)*DR_H/r.height ]; };
+  paint.onpointerdown=e=>{
+    if(locked||pid!==null) return; e.preventDefault(); const [x,y]=pos(e);
+    if(tool==="fill"){ const op={type:"fill",x,y,c:color}; ops.push(op); fillOp(op); tone(520,.08,"triangle"); return; }
+    if(tool==="sticker"){ const op={type:"sticker",t:sticker,x,y,s:DR_STK[size]}; ops.push(op); stickerOp(pc,op); tone(880,.08,"triangle"); return; }
+    pid=e.pointerId; try{ paint.setPointerCapture(pid); }catch(err){}
+    curOp={type:"stroke",c:color,s:tool==="eraser"?DR_SIZES[size]*2:DR_SIZES[size],e:tool==="eraser",p:[[x,y]]};
+    strokeOp(pc,curOp);
+  };
+  paint.onpointermove=e=>{
+    if(e.pointerId!==pid||!curOp) return; e.preventDefault();
+    const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e]; const from=curOp.p.length;
+    (evs.length?evs:[e]).forEach(ev=>{ const q=pos(ev), l=curOp.p[curOp.p.length-1]; if(Math.abs(q[0]-l[0])+Math.abs(q[1]-l[1])>1.5) curOp.p.push(q); });
+    if(curOp.p.length>from) strokeOp(pc,curOp,from);
+  };
+  const up=e=>{ if(e.pointerId!==pid) return; pid=null; if(curOp){ ops.push(curOp); curOp=null; } };
+  paint.onpointerup=up; paint.onpointercancel=up;
+
+  function save(){
+    const k=cur();
+    if(ops.length<3){ toast(t("drTooLittle")); return; }
+    if(!k||isGuest()){ toast(t("drGuestNote")); return; }
+    if(!F){ toast(t("drNoNet")); return; }
+    const out=document.createElement("canvas"); out.width=800; out.height=600; const oc=out.getContext("2d");
+    oc.fillStyle="#fff"; oc.fillRect(0,0,800,600); oc.drawImage(paint,0,0,800,600); if(linesCv) oc.drawImage(linesCv,0,0,800,600);
+    let img=out.toDataURL("image/jpeg",.72); if(img.length>600000) img=out.toDataURL("image/jpeg",.5);
+    F.setDoc(F.doc(F.collection(F.db,"drawings")),{kid:k.id,at:F.serverTimestamp(),mode,img,topic:String(title).slice(0,60)})
+      .catch(e=>{ console.warn(e); toast(t("drSaveErr")); });
+    // One star per saved drawing, up to DR_DAILY a day.
+    const n=drCountToday(k), star=n<DR_DAILY?1:0;
+    k.best=k.best||{}; k.best.drawDay=drToday()+":"+(n+1); k.stars=(k.stars||0)+star;
+    cacheKids(); cloudReward(k,star,"drawDay",k.best.drawDay,true); refreshStars();
+    if(star) chime(); else tone(660,.15,"triangle");
+    $("#layer").innerHTML=`<div class="overlay"><div class="sheet" role="dialog" aria-modal="true">
+      <h2>${t("drSaved")}</h2>
+      <img class="dr-prev" src="${img}" alt="">
+      <div style="font-size:1.3rem;font-weight:800">${star?`⭐ ${t("got")(num(1))}`:t("drLimit")(num(DR_DAILY))}</div>
+      <div class="row"><button class="big" id="drNew">${t("drNew")}</button><button class="ghost soft" id="drGal">🖼️ ${t("drGallery")}</button><button class="ghost soft" id="toHub">${t("home")}</button></div>
+    </div></div>`;
+    $("#drNew").onclick=()=>{ $("#layer").innerHTML=""; if(mode==="challenge") openCanvas("challenge",null,randomTopic()); else if(mode==="color") pickPage(); else openCanvas("free"); };
+    $("#drGal").onclick=()=>{ $("#layer").innerHTML=""; openGallery(); };
+    $("#toHub").onclick=()=>{ $("#layer").innerHTML=""; go("hub"); };
+  }
+
+  if(mode==="challenge"){
+    const hud=()=>$("#hud").innerHTML=`<span class="pill">⏱ ${mmss(left)}</span>`; hud();
+    tick=setInterval(()=>{ left--; hud(); if(left<=0){ clearInterval(tick); locked=true; $("#lock").hidden=false; tone(330,.4,"triangle"); } },1000);
+  } else $("#hud").innerHTML="";
+  cleanup=()=>{ clearInterval(tick); };
+}
+
+function openGallery(){
+  drLeave(); $("#back").onclick=drawMenu; $("#hud").innerHTML="";
+  let items=[], filter="all";
+  $("#stage").innerHTML=`<div class="gal-wrap"><div class="gal-filter" id="gf"></div><div class="gal" id="gal"><p class="note">${t("loadingKids")}</p></div></div>`;
+  if(isGuest()||!role||!F){ $("#gal").innerHTML=`<p class="note">${t("drGalNeeds")}</p>`; return; }
+  const name=id=>{ const k=kids.find(x=>x.id===id); return k?`${k.avatar} ${kidName(k)}`:"—"; };
+  const drawF=()=>{ $("#gf").innerHTML=[["all",t("drAll")],...kids.map(k=>[k.id,`${k.avatar} ${kidName(k)}`])].map(([id,l])=>`<button class="mt-pill${filter===id?" on":""}" data-f="${esc(id)}">${esc(l)}</button>`).join("");
+    document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{ filter=b.dataset.f; drawF(); grid(); }); };
+  const grid=()=>{ const list=items.filter(x=>filter==="all"||x.kid===filter);
+    $("#gal").innerHTML = list.length ? list.map(x=>`<button class="gal-item" data-gi="${esc(x.id)}"><img src="${x.img}" alt="" loading="lazy"><span>${esc(name(x.kid))}</span>${x.topic?`<small>${esc(x.topic)}</small>`:""}</button>`).join("")
+      : `<p class="note">${t("drGalEmpty")}</p>`;
+    document.querySelectorAll("[data-gi]").forEach(b=>b.onclick=()=>viewItem(items.find(x=>x.id===b.dataset.gi))); };
+  function viewItem(x){ if(!x) return;
+    const when=x.at&&x.at.toDate?x.at.toDate().toLocaleDateString(lang==="ar"?"ar-SA":"en-US",{day:"numeric",month:"long"}):"";
+    $("#layer").innerHTML=`<div class="overlay"><div class="sheet" role="dialog" aria-modal="true" style="width:min(720px,100%)">
+      <img class="dr-big" src="${x.img}" alt="">
+      <div style="font-size:1.3rem;font-weight:800">${esc(name(x.kid))}</div>
+      <div class="small">${x.topic?esc(x.topic)+" · ":""}${esc(when)}</div>
+      <div class="row"><button class="big" id="gClose">${t("close")}</button>${role==="admin"?`<button class="danger" id="gDel">🗑️ ${t("drDelete")}</button>`:""}</div>
+    </div></div>`;
+    $("#gClose").onclick=()=>$("#layer").innerHTML="";
+    const d=$("#gDel"); if(d) twoTap(d,()=>{ F.deleteDoc(F.doc(F.db,"drawings",x.id)).catch(onCloudError); $("#layer").innerHTML=""; });
+  }
+  drawF();
+  const un=F.onSnapshot(F.query(F.collection(F.db,"drawings"),F.orderBy("at","desc"),F.limit(60)), s=>{
+    items=s.docs.map(d=>({id:d.id,...d.data()})); grid();
+  }, e=>{ console.warn(e); $("#gal").innerHTML=`<p class="note">${t("drSaveErr")}</p>`; });
+  cleanup=()=>un();
+}
+
 // ================= profile editor =================
 function openEditor(id){
   const existing = kids.find(k=>k.id===id);
@@ -1161,6 +1475,19 @@ service cloud.firestore {
       allow delete: if isAdmin() || (signedIn() && request.auth.uid == deviceId);
     }
 
+    // Drawings gallery: approved devices add drawings and everyone sees them; only the admin deletes.
+    match /drawings/{drawingId} {
+      allow read: if isAdmin() || isDevice();
+      allow create: if (isAdmin() || isDevice())
+        && request.resource.data.keys().hasOnly(['kid', 'at', 'mode', 'img', 'topic'])
+        && request.resource.data.kid is string && request.resource.data.kid.size() <= 40
+        && request.resource.data.mode in ['free', 'color', 'challenge']
+        && request.resource.data.img is string && request.resource.data.img.size() < 700000
+        && request.resource.data.topic is string && request.resource.data.topic.size() <= 60
+        && request.resource.data.at == request.time;
+      allow delete: if isAdmin();
+    }
+
     // Older setup, kept only so the admin's earlier data can be moved over.
     match /users/{userId}/kids/{kidId} {
       allow read, delete: if signedIn() && request.auth.uid == userId;
@@ -1298,6 +1625,7 @@ async function startCloud(){
     try{ db = fs.initializeFirestore(app,{localCache:fs.persistentLocalCache()}); }
     catch(e){ db = fs.getFirestore(app); }
     F = {db, doc:fs.doc, collection:fs.collection, setDoc:fs.setDoc, updateDoc:fs.updateDoc, deleteDoc:fs.deleteDoc,
+         query:fs.query, orderBy:fs.orderBy, limit:fs.limit,
          onSnapshot:fs.onSnapshot, increment:fs.increment, getDocs:fs.getDocs, serverTimestamp:fs.serverTimestamp};
     au.onAuthStateChanged(auth, user=>{
       stopAll(); requests=[]; devices=[]; myRequest=null;
